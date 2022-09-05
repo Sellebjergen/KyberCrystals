@@ -6,14 +6,14 @@ public class Kyber
 {
     public Kyber(Params p)
     {
-        // TOOD: do something more interesting.
+        // TODO: do something more interesting.
     }
 }
 
 public class PolynomialRing
 {
-    private BigInteger _q;
-    private BigInteger _n;
+    private readonly BigInteger _q;
+    private readonly BigInteger _n;
     
     public PolynomialRing(BigInteger q, BigInteger n)
     {
