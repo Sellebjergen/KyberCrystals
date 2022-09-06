@@ -6,7 +6,7 @@ The specification can be found on the following link https://pq-crystals.org/kyb
 * NTT, We need to discuss what this is exactly.
   * seems to be some kind of fourier transformation
 * How do I get my functions well tested?
-  * It is not very easy to test the project, when you don't really know the math behind.
+  * It is not very easy to test the project and its different functions.
 
 ## number theoretic transform (NTT)
 https://www.nayuki.io/page/number-theoretic-transform-integer-dft
