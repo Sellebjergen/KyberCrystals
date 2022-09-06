@@ -89,6 +89,34 @@ public class PolynomialRing
 
         return new Polynomial(coefficients);
     }
+
+    // Note that l is the amount of 32 bytes we need to reach n.
+    // l = 8   =>   l * 32 = 256, which is used in the algorithm from the spec.
+    public Polynomial Decode(byte[] bytes, int l)
+    {
+        var bits = new BitArray(bytes);
+        var coefficients = new List<int>();
+        
+        for (var i = 0; i < 256; i++)
+        {
+            var temp = 0.0;
+            for (var j = 0; j < l - 1; j++)
+            {
+                var a = bits[i * l + j];
+                switch (a)
+                {
+                    case true:
+                        temp += 1 * Math.Pow(2, j);
+                        break;
+                    default:
+                        continue;
+                }
+            }
+            coefficients.Add((int) temp);
+        }
+
+        return new Polynomial(coefficients);
+    }
 }
 
 public class Polynomial

@@ -27,6 +27,20 @@ public class PolynomiaTests
 
         Assert.True(Helpers.ComparePolynomials(res1, res2));
     }
+
+    [Fact]
+    public void RunningDecode_TwiceOnSameInput_GivesSameOutput()
+    {
+        var l = 8;
+        var p = new Constants().Kyber512();
+        var bytes = Helpers.GetRandomBytes(32 * l);
+
+        var rq = new PolynomialRing(p.Q, p.N);
+        var res1 = rq.Decode(bytes, l);
+        var res2 = rq.Decode(bytes, l);
+        
+        Assert.True(Helpers.ComparePolynomials(res1, res2));
+    }
 }
 
 public static class Helpers
