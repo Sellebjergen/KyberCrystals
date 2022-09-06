@@ -1,8 +1,12 @@
 # Notes for the project
+These are my notes for the PQP project regarding coding of the CRYSTALS-kyber algorithm.
+The specification can be found on the following link https://pq-crystals.org/kyber/data/kyber-specification-round3-20210804.pdf.
 
 # Questions for Diego
 * NTT, We need to discuss what this is exactly.
   * seems to be some kind of fourier transformation
+* How do I get my functions well tested?
+  * It is not very easy to test the project, when you don't really know the math behind.
 
 ## number theoretic transform (NTT)
 https://www.nayuki.io/page/number-theoretic-transform-integer-dft

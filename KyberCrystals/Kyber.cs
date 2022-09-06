@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections;
+using System.Numerics;
 
 namespace KyberCrystals;
 
@@ -25,7 +26,7 @@ public class PolynomialRing
     {
         var i = 0;
         var j = 0;
-        var coefficients = Array.Empty<int>();
+        var coefficients = new List<int>();
         
         while (j < _n)
         {
@@ -34,13 +35,13 @@ public class PolynomialRing
 
             if (d1 < _q)
             {
-                coefficients[j] = d1;
+                coefficients.Add(d1);
                 j += 1;
             }
 
             if (d2 < _q && j < _q)
             {
-                coefficients[j] = d2;
+                coefficients.Add(d2);
                 j += 1;
             }
 
@@ -49,15 +50,64 @@ public class PolynomialRing
 
         return new Polynomial(coefficients);
     }
+
+    public Polynomial Cbd(byte[] bytes, int eta)
+    {
+        var bits = new BitArray(bytes);
+        var coefficients = new List<int>();
+        
+        for (var i = 0; i < 256; i++)
+        {
+            var a = 0;
+            for (var j = 0; j < eta; j++)
+            {
+                switch (bits[2 * i * eta + j])
+                {
+                    case true:
+                        a += 1;
+                        break;
+                    case false:
+                        continue;
+                }
+            }
+            
+            var b = 0;
+            for (var j = 0; j < eta; j++)
+            {
+                switch (bits[2 * i * eta + eta + j])
+                {
+                    case true:
+                        b += 1;
+                        break;
+                    case false:
+                        continue;
+                }
+            }
+
+            coefficients.Add(a - b);
+        }
+
+        return new Polynomial(coefficients);
+    }
 }
 
 public class Polynomial
 {
-    private int[] _coefficients;
+    private readonly List<int> _coefficients;
     
-    public Polynomial(int[] coefficients)
+    public Polynomial(List<int> coefficients)
     {
         _coefficients = coefficients;
+    }
+
+    public int GetCoefficient(int i)
+    {
+        return _coefficients[i];
+    }
+
+    public int GetDegree()
+    {
+        return _coefficients.Count;
     }
 }
 
@@ -80,13 +130,13 @@ public class Constants
 
     public Params Kyber768()
     {
-        // TODO
+        // TODO: just update from the article
         return null;
     }
     
     public Params Kyber1024()
     {
-        // TODO
+        // TODO: just update from the article
         return null;
     }
 }
