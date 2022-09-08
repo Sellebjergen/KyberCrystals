@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="BouncyCastle" Version="1.8.9" />
+      <PackageReference Include="SHA3" Version="1.0.0-rc" />
+    </ItemGroup>
+
 </Project>
