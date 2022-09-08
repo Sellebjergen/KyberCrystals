@@ -17,7 +17,7 @@ public class UtilityTesting
     [Fact]
     public void HashFunction_G_returns_CorrectAmountOfBytes()
     {
-        var (x, y) = Utils.G(Helpers.GetRandomBytes(32));
+        var (x, y) = Utils.G(TestHelpers.GetRandomBytes(32));
         
         Assert.Equal(32, x.Length);
         Assert.Equal(32, y.Length);
@@ -26,7 +26,7 @@ public class UtilityTesting
     [Fact]
     public void HashFunction_H_returns_CorrectAmountOfBytes()
     {
-        var x = Utils.H(Helpers.GetRandomBytes(32));
+        var x = Utils.H(TestHelpers.GetRandomBytes(32));
         
         Assert.Equal(32, x.Length);
     }
@@ -34,8 +34,8 @@ public class UtilityTesting
     [Fact]
     public void sss() // TODO: better naming.
     {
-        var bytes = Helpers.GetRandomBytes(32);
-        var b = Helpers.GetRandomByte();
+        var bytes = TestHelpers.GetRandomBytes(32);
+        var b = TestHelpers.GetRandomByte();
 
         var x = Utils.Prf(bytes, b, 100);
 
@@ -45,8 +45,8 @@ public class UtilityTesting
     [Fact]
     public void PrfUtility_ThrowsArgumentException_IfByteArrayIsBelowLength32()
     {
-        var bytes = Helpers.GetRandomBytes(31);
-        var b = Helpers.GetRandomByte();
+        var bytes = TestHelpers.GetRandomBytes(31);
+        var b = TestHelpers.GetRandomByte();
 
         Assert.Throws<ArgumentException>(() => Utils.Prf(bytes, b, 100));
     }
@@ -54,8 +54,8 @@ public class UtilityTesting
     [Fact]
     public void PrfUtility_ThrowsArgumentException_IfByteArrayIsAboveLength32()
     {
-        var bytes = Helpers.GetRandomBytes(33);
-        var b = Helpers.GetRandomByte();
+        var bytes = TestHelpers.GetRandomBytes(33);
+        var b = TestHelpers.GetRandomByte();
 
         Assert.Throws<ArgumentException>(() => Utils.Prf(bytes, b, 100));
     }
@@ -63,9 +63,9 @@ public class UtilityTesting
     [Fact]
     public void XofUtility_ThrowsArgumentException_IfByteArrayIsBelowLength32()
     {
-        var bytes = Helpers.GetRandomBytes(31);
-        var b = Helpers.GetRandomByte();
-        var b2 = Helpers.GetRandomByte();
+        var bytes = TestHelpers.GetRandomBytes(31);
+        var b = TestHelpers.GetRandomByte();
+        var b2 = TestHelpers.GetRandomByte();
 
         Assert.Throws<ArgumentException>(() => Utils.Xof(bytes, b, b2, 100));
     }
@@ -73,9 +73,9 @@ public class UtilityTesting
     [Fact]
     public void XofUtility_ThrowsArgumentException_IfByteArrayIsAboveLength32()
     {
-        var bytes = Helpers.GetRandomBytes(33);
-        var b = Helpers.GetRandomByte();
-        var b2 = Helpers.GetRandomByte();
+        var bytes = TestHelpers.GetRandomBytes(33);
+        var b = TestHelpers.GetRandomByte();
+        var b2 = TestHelpers.GetRandomByte();
 
         Assert.Throws<ArgumentException>(() => Utils.Xof(bytes, b, b2, 100));
     }
@@ -83,9 +83,9 @@ public class UtilityTesting
     [Fact]
     public void Ss1() // TODO: better naming.
     {
-        var bytes = Helpers.GetRandomBytes(32);
-        var b = Helpers.GetRandomByte();
-        var b2 = Helpers.GetRandomByte();
+        var bytes = TestHelpers.GetRandomBytes(32);
+        var b = TestHelpers.GetRandomByte();
+        var b2 = TestHelpers.GetRandomByte();
 
         var x = Utils.Xof(bytes, b, b2, 100);
 

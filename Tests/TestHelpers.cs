@@ -2,7 +2,7 @@ using KyberCrystals;
 
 namespace Tests;
 
-public static class Helpers
+public static class TestHelpers
 {
     public static byte[] GetRandomBytes(int length)
     {
