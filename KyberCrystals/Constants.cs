@@ -7,11 +7,11 @@ public class Constants
     {
         return new Params
         {
-            N = 512,
+            N = 256,
             K = 2,
             Q = 3329,
             Eta1 = 3,
-            Eta2A = 2,
+            Eta2 = 2,
             Du = 10,
             Dv = 4
         };
@@ -19,18 +19,34 @@ public class Constants
 
     public Params Kyber768()
     {
-        // TODO: just update from the article
-        return null;
+        return new Params
+        {
+            N = 256,
+            K = 3,
+            Q = 3329,
+            Eta1 = 2,
+            Eta2 = 2,
+            Du = 10,
+            Dv = 4
+        };
     }
     
     public Params Kyber1024()
     {
-        // TODO: just update from the article
-        return null;
+        return new Params
+        {
+            N = 256,
+            K = 4,
+            Q = 3329,
+            Eta1 = 2,
+            Eta2 = 2,
+            Du = 11,
+            Dv = 5
+        };
     }
 
-    public static readonly int[] NttZetas = 
-    {2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962, 2127, 1855, 1468,
+    public static readonly int[] NttZetas = {
+        2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962, 2127, 1855, 1468,
         573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017, 732, 608, 1787, 411, 3124, 1758,
         1223, 652, 2777, 1015, 2036, 1491, 3047, 1785, 516, 3321, 3009, 2663, 1711, 2167, 126, 1469,
         2476, 3239, 3058, 830, 107, 1908, 3082, 2378, 2931, 961, 1821, 2604, 448, 2264, 677, 2054,
