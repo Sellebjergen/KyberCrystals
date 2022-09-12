@@ -28,7 +28,6 @@ public class Kyber
                 var jByte = BitConverter.GetBytes(j).First();
                 var iByte = BitConverter.GetBytes(i).First();
                 
-                // TODO: could make a function to convert int to byte. This could throw an error if int > 255 used.
                 A[i][j] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq._n)));
             }
         }
@@ -53,7 +52,7 @@ public class Kyber
         
         // Convert s and e to NTT form.
         if (_rq._n != 256) 
-            // TODO: this could possibly be a better solution.
+            // TODO: the algorithm does not specify for n != 256, but it must be possible?
             throw new NotImplementedException("Kyber only specifies for n = 256");
 
         foreach (var p in s)
@@ -63,6 +62,5 @@ public class Kyber
             p.ReduceToNttForm();
 
         // TODO: implement the rest of the key generation.
-        
     }
 }

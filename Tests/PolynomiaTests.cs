@@ -102,6 +102,4 @@ public class PolynomiaTests
         
         Assert.Equal(1, p.GetDegree());
     }
-    
-    // TODO: Modulo runs after Mult operation
 }
