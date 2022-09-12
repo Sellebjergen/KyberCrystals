@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Numerics;
+using Org.BouncyCastle.Crypto.Macs;
 
 namespace KyberCrystals;
 
 public class PolynomialRing
 {
-    private BigInteger _q { get;  } // TODO: Is this the c# way of doing things?
+    private BigInteger _q { get;  }
     public BigInteger _n { get; }
     
     public PolynomialRing(BigInteger q, BigInteger n)
@@ -112,15 +113,47 @@ public class PolynomialRing
 
     public Polynomial Add(Polynomial p1, Polynomial p2)
     {
-        var p1Coef = p1.GetCoefficients();
-        var p2Coef = p2.GetCoefficients();
-
+        var maxDeg = Math.Max(p1.GetDegree(), p2.GetDegree());
+        var p1Coef = p1.GetPaddedCoefficients(maxDeg);
+        var p2Coef = p2.GetPaddedCoefficients(maxDeg);
+        
         var result = new List<BigInteger> { };
         foreach (var (x, y) in p1Coef.Zip(p2Coef))
         {
             result.Add(x + y);
         }
 
-        return new Polynomial(result);
+        var res = ReduceModuloQ(new Polynomial(result));
+        return res;
+    }
+
+    public Polynomial Mult(Polynomial p1, Polynomial p2)
+    {
+        var res = new List<BigInteger>();
+        for (var i = 0; i < Math.Pow(Math.Max(p1.GetDegree(), p2.GetDegree()), 2); i ++)
+        {
+            res.Add(BigInteger.Zero);
+        }
+        
+        for (var i = 0; i < p1.GetDegree(); i++)
+        {
+            for (var j = 0; j < p2.GetDegree(); j++)
+            {
+                res[i + j] += p1.GetCoefficient(i) * p2.GetCoefficient(j);
+            }
+        }
+
+        var resPoly = ReduceModuloQ(new Polynomial(res));
+        resPoly.RemoveTrailingZeros();
+        return resPoly;
+    }
+
+    private Polynomial ReduceModuloQ(Polynomial p)
+    {
+        var res = p.GetCoefficients()
+            .Select(c => BigInteger.ModPow(c, 1, _q))
+            .ToList();
+
+        return new Polynomial(res);
     }
 }

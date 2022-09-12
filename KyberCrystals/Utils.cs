@@ -96,10 +96,4 @@ public static class Utils
     {
         return montgomery_reduce(a * b);
     }
-
-    public static Polynomial[] NeedABetterName(Polynomial[][] hejsa, Polynomial[] p2)
-    {
-        // TODO: Have to agree with Diego that this is just simple matrix multiplication.
-        return null;
-    }
 }

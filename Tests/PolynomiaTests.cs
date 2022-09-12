@@ -4,6 +4,8 @@ using Xunit;
 
 namespace Tests;
 
+// TODO: Add some more theories, to test for more polynomials.
+
 public class PolynomiaTests
 {
     [Fact]
@@ -41,4 +43,65 @@ public class PolynomiaTests
         
         Assert.True(TestHelpers.ComparePolynomials(res1, res2));
     }
+
+    [Fact]
+    public void AskingFor_NotSetCoefficient_Returns0() {
+        var p = new Polynomial(new List<BigInteger> {1, 2, 3});
+        var notSetCoef = p.GetCoefficient(8);
+
+        Assert.Equal(0, notSetCoef);
+    }
+
+    [Fact]
+    public void Modulo_Runs_AfterAddOperation()
+    {
+        var param = new Constants().Kyber512();
+        var rq = new PolynomialRing(param.Q, param.N);
+        var poly1 = new Polynomial(new List<BigInteger> { param.Q - 1, param.Q - 1, param.Q - 1 });
+        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
+
+        var res = rq.Add(poly1, poly2);
+        var expected = new Polynomial(new List<BigInteger> { 0, 0, 0 });
+
+        Assert.True(TestHelpers.ComparePolynomials(expected, res));
+    }
+
+    [Fact]
+    public void Multiplication_OverRq_Works()
+    {
+        var param = new Constants().Kyber512();
+        var rq = new PolynomialRing(param.Q, param.N);
+        
+        var poly1 = new Polynomial(new List<BigInteger> { 1, 1, 1});
+        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
+        var res = rq.Mult(poly1, poly2);
+        
+        var expPoly = new Polynomial(new List<BigInteger> { 1, 2, 3, 2, 1 }); // found with google
+        Assert.True(TestHelpers.ComparePolynomials(res, expPoly));
+    }
+
+    [Fact]
+    public void Modulo_Runs_AfterMultOperation()
+    {
+        var param = new Constants().Kyber512();
+        var rq = new PolynomialRing(param.Q, param.N);
+        var poly1 = new Polynomial(new List<BigInteger> { param.Q - 1, param.Q - 1, param.Q - 1 });
+        var poly2 = new Polynomial(new List<BigInteger> { 2, 2, 2 });
+
+        var res = rq.Mult(poly1, poly2);
+
+        Assert.True(res.GetCoefficients().TrueForAll(x => x < param.Q));
+
+}
+
+    [Fact]
+    public void RemoveTrailingZeros_ReducesTheDegree()
+    {
+        var p = new Polynomial(new List<BigInteger> { 1, 0, 0, 0});
+        p.RemoveTrailingZeros();
+        
+        Assert.Equal(1, p.GetDegree());
+    }
+    
+    // TODO: Modulo runs after Mult operation
 }

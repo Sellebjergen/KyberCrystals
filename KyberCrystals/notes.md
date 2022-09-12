@@ -2,7 +2,10 @@
 These are my notes for the PQP project regarding coding of the CRYSTALS-kyber algorithm.
 The specification can be found on the following link https://pq-crystals.org/kyber/data/kyber-specification-round3-20210804.pdf.
 
-# Questions for Diego
+## TODO:
+* Clean the code and the unit tests.
+
+## Questions for Diego
 * NTT, We need to discuss what this is exactly.
   * seems to be some kind of fourier transformation
 * How do I get my functions well tested?
@@ -11,6 +14,9 @@ The specification can be found on the following link https://pq-crystals.org/kyb
 * I seems as if I have some kind of mistake when using bouncy castle shake implementation, as i Can't control the output length of the hash.
   * https://emn178.github.io/online-tools/shake_256.html
 * How to calculate A o s + e, we agree that is just normal matrix multiplication?
+
+## Questions for Søren
+* Usage of Get property in C#
 
 ## number theoretic transform (NTT)
 * https://www.nayuki.io/page/number-theoretic-transform-integer-dft
