@@ -1,28 +1,26 @@
 using System.Numerics;
+using System.Xml;
 
 namespace KyberCrystals;
 
 public interface IPolyModStrategy
 { 
-    public Polynomial PolyMod(Polynomial p, Polynomial mod);
+    public Polynomial PolyMod(PolynomialRing rq, Polynomial p, Polynomial mod);
 }
 
 public class LongPolynomialDivision : IPolyModStrategy 
 {
-    public Polynomial PolyMod(Polynomial p, Polynomial mod)
+    public Polynomial PolyMod(PolynomialRing rq, Polynomial p, Polynomial mod)
     {
-        var nd = p.GetDegree();
-        var dd = mod.GetDegree();
+        var r = new Polynomial(p.GetCoefficients());
+
+        while (!r.IsZeroPolynomial() && r.GetDegree() >= mod.GetDegree())
+        {
+            var t = r.GetCoefficient(r.GetDegree()) / mod.GetCoefficient(mod.GetDegree());
+            var modulo_mul_t = rq.ConstMult(mod, t);
+            
+        }
 
         return null;
-    }
-}
-
-// TODO: if time permits.
-public class SynteticDivision : IPolyModStrategy
-{
-    public Polynomial PolyMod(Polynomial p, Polynomial mod)
-    {
-        throw new NotImplementedException();
     }
 }

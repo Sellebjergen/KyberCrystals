@@ -164,6 +164,17 @@ public class PolynomialRing
         return res;
     }
 
+    public Polynomial ConstMult(Polynomial p1, BigInteger c)
+    {
+        var res = new List<BigInteger>();
+        foreach (var pc in p1.GetCoefficients())
+        {
+            res.Add(pc * c);
+        }
+
+        return ReduceModuloQ(new Polynomial(res));
+    }
+
     private Polynomial ReduceModuloQ(Polynomial p)
     {
         var res = new List<BigInteger>();
