@@ -148,11 +148,34 @@ public class PolynomialRing
         return resPoly;
     }
 
+    public Polynomial Sub(Polynomial p1, Polynomial p2)
+    {
+        var maxDeg = Math.Max(p1.GetDegree(), p2.GetDegree());
+        var p1Coef = p1.GetPaddedCoefficients(maxDeg);
+        var p2Coef = p2.GetPaddedCoefficients(maxDeg);
+
+        var result = new List<BigInteger> { };
+        foreach (var (x, y) in p1Coef.Zip(p2Coef))
+        {
+            result.Add(x - y);
+        }
+
+        var res = ReduceModuloQ(new Polynomial(result));
+        return res;
+    }
+
     private Polynomial ReduceModuloQ(Polynomial p)
     {
-        var res = p.GetCoefficients()
-            .Select(c => BigInteger.ModPow(c, 1, _q))
-            .ToList();
+        var res = new List<BigInteger>();
+
+        foreach (var c in p.GetCoefficients())
+        {
+            var temp = BigInteger.ModPow(c, 1, _q);
+            if (temp >= 0)
+                res.Add(temp);
+            else
+                res.Add(temp + _q);
+        }
 
         return new Polynomial(res);
     }

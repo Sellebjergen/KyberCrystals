@@ -8,6 +8,8 @@ The specification can be found on the following link https://pq-crystals.org/kyb
   * 2 versions
 * euclidian gcd function implementation???
 * Read this seemingly good introduction to Kyber https://cryptopedia.dev/posts/kyber/
+* (maybe) A bit of theory about how AES works and why that is quantum secure?
+* Recovering the private key requires to solve the module-learning-with-errors problem
 
 ## Questions for Diego
 1. first
@@ -19,10 +21,6 @@ The specification can be found on the following link https://pq-crystals.org/kyb
     * I seems as if I have some kind of mistake when using bouncy castle shake implementation, as i Can't control the output length of the hash.
       * https://emn178.github.io/online-tools/shake_256.html
     * How to calculate A o s + e, we agree that is just normal matrix multiplication?
-
-2. second
-   * This value NN is the product of two primes pp and qq, both of which are 2048 bits, and which are known during decryption.
-     * not necessarely true, right?
 
 ## Questions for Søren
 * Usage of Get property in C#

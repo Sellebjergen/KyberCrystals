@@ -85,4 +85,9 @@ public class Polynomial
             i -= 1;
         }
     }
+
+    public bool IsZeroPolynomial()
+    {
+        return _coefficients.All(c => c == BigInteger.Zero);
+    }
 }

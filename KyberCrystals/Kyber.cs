@@ -52,7 +52,7 @@ public class Kyber
         
         // Convert s and e to NTT form.
         if (_rq._n != 256) 
-            // TODO: the algorithm does not specify for n != 256, but it must be possible?
+            // TODO: the paper does not specify for n != 256, but it must be possible?
             throw new NotImplementedException("Kyber only specifies for n = 256");
 
         foreach (var p in s)
