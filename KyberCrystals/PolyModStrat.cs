@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Xml;
 
 namespace KyberCrystals;
 
@@ -19,12 +18,7 @@ public class LongPolynomialDivision : IPolyModStrategy
             var t = r.GetCoefficient(r.GetDegree() - 1) / mod.GetCoefficient(mod.GetDegree() - 1);
             var modMulT = rq.ConstMult(mod, t);
             var shift = ShiftPolynomial(modMulT, r.GetDegree() - mod.GetDegree());
-
-            var temp = rq.Sub(r, shift);
-            if (temp.IsZeroPolynomial())
-                return r;
-
-            r = temp;
+            r = rq.Sub(r, shift);
         }
 
         return r;

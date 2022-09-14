@@ -214,10 +214,23 @@ public class PolynomiaTests
     {
         var param = new Constants().Kyber512();
         var rq = new PolynomialRing(param.Q, 1);
-        var poly1 = new Polynomial(new List<BigInteger> {2, 3, 1});     // 2 + 3x + x^2
+        var p = new Polynomial(new List<BigInteger> {1, 3, 1});     // 1 + 3x + x^2
 
-        var res = rq.ModPoly(poly1);
-        var expectedPoly = new Polynomial(new List<BigInteger> { 2, 1 });
+        var res = rq.ModPoly(p);
+        var expectedPoly = new Polynomial(new List<BigInteger> { 3328 });
+        
+        Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
+    }
+    
+    [Fact]
+    public void Test2_PolynomialLongDivision()
+    {
+        var param = new Constants().Kyber512();
+        var rq = new PolynomialRing(param.Q, 1);
+        var p = new Polynomial(new List<BigInteger> {2, 3, 1});     // 1 + 3x + x^2
+
+        var res = rq.ModPoly(p);
+        var expectedPoly = new Polynomial(new List<BigInteger> { 0 });
         
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }
