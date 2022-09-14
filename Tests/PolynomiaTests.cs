@@ -1,5 +1,4 @@
 using System.Numerics;
-using System.Reflection.Metadata;
 using KyberCrystals;
 using Xunit;
 
@@ -192,6 +191,33 @@ public class PolynomiaTests
 
         var res = rq.ConstMult(poly1, 2);
         var expectedPoly = new Polynomial(new List<BigInteger> { param.Q - 2, param.Q - 2, param.Q - 2 });
+        
+        Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
+    }
+
+    [Fact]
+    public void Sub_RemovesZeroes_IfPresent()
+    {
+        var param = new Constants().Kyber512();
+        var rq = new PolynomialRing(param.Q, param.N);
+        var poly1 = new Polynomial(new List<BigInteger> {1, 2, param.Q - 1});
+        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, param.Q - 1});
+
+        var res = rq.Sub(poly1, poly2);
+        var expectedPoly = new Polynomial(new List<BigInteger> { 0, 1});
+        
+        Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
+    }
+
+    [Fact]
+    public void Test_PolynomialLongDivision()
+    {
+        var param = new Constants().Kyber512();
+        var rq = new PolynomialRing(param.Q, 1);
+        var poly1 = new Polynomial(new List<BigInteger> {2, 3, 1});     // 2 + 3x + x^2
+
+        var res = rq.ModPoly(poly1);
+        var expectedPoly = new Polynomial(new List<BigInteger> { 2, 1 });
         
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }

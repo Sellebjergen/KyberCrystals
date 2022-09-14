@@ -16,11 +16,30 @@ public class LongPolynomialDivision : IPolyModStrategy
 
         while (!r.IsZeroPolynomial() && r.GetDegree() >= mod.GetDegree())
         {
-            var t = r.GetCoefficient(r.GetDegree()) / mod.GetCoefficient(mod.GetDegree());
-            var modulo_mul_t = rq.ConstMult(mod, t);
-            
+            var t = r.GetCoefficient(r.GetDegree() - 1) / mod.GetCoefficient(mod.GetDegree() - 1);
+            var modMulT = rq.ConstMult(mod, t);
+            var shift = ShiftPolynomial(modMulT, r.GetDegree() - mod.GetDegree());
+
+            var temp = rq.Sub(r, shift);
+            if (temp.IsZeroPolynomial())
+                return r;
+
+            r = temp;
         }
 
-        return null;
+        return r;
+    }
+
+    private Polynomial ShiftPolynomial(Polynomial p, int amount)
+    {
+        var coef = new List<BigInteger>();
+
+        for (var i = 0; i < amount; i++)
+            coef.Add(BigInteger.Zero);
+
+        foreach (var c in p.GetCoefficients())
+            coef.Add(c);
+
+        return new Polynomial(coef);
     }
 }

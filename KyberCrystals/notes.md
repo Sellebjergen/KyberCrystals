@@ -22,6 +22,9 @@ The specification can be found on the following link https://pq-crystals.org/kyb
       * https://emn178.github.io/online-tools/shake_256.html
     * How to calculate A o s + e, we agree that is just normal matrix multiplication?
 
+2. Second
+   * We agree that it is only during multiplication we get a polynomia of a higher degree?
+
 ## Questions for Søren
 * Usage of Get property in C#
 * How do I organise unit tests? One test for Add, Mult etc and then a lot of theories? - seems to give bad naming as to what is wrong.

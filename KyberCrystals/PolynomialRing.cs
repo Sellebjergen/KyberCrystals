@@ -8,11 +8,21 @@ public class PolynomialRing
 {
     private BigInteger _q { get;  }
     public BigInteger _n { get; }
-    
+    public Polynomial _modPoly;
+    private IPolyModStrategy _polyModStrategy = new LongPolynomialDivision();
+
     public PolynomialRing(BigInteger q, BigInteger n)
     {
         _q = q;
         _n = n;
+        var coef = new List<BigInteger>{1};
+        
+        for (var i = 0; i < n - 1; i++)
+        {
+            coef.Add(BigInteger.Zero);
+        }
+        coef.Add(BigInteger.One);
+        _modPoly = new Polynomial(coef);
     }
 
     public Polynomial Parse(byte[] bytes)
@@ -161,6 +171,7 @@ public class PolynomialRing
         }
 
         var res = ReduceModuloQ(new Polynomial(result));
+        res.RemoveTrailingZeros();
         return res;
     }
 
@@ -173,6 +184,11 @@ public class PolynomialRing
         }
 
         return ReduceModuloQ(new Polynomial(res));
+    }
+
+    public Polynomial ModPoly(Polynomial p)
+    {
+        return _polyModStrategy.PolyMod(this, p, _modPoly);
     }
 
     private Polynomial ReduceModuloQ(Polynomial p)
