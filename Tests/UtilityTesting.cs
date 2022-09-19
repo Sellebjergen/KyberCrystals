@@ -7,13 +7,6 @@ namespace Tests;
 
 public class UtilityTesting 
 {
-    private readonly ITestOutputHelper _testOutputHelper;
-
-    public UtilityTesting(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
-    }
-
     [Fact]
     public void HashFunction_G_returns_CorrectAmountOfBytes()
     {
@@ -95,7 +88,7 @@ public class UtilityTesting
     [Fact]
     public void ShakeDigest_AgreeWith_OnlineService()
     {
-        var outLengthOfHash = 100;
+        var outLengthOfHash = 256;
         var hashAlgorihtm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
         var bytes = Encoding.ASCII.GetBytes("hearsay");
         hashAlgorihtm.BlockUpdate(bytes, 0, bytes.Length);
@@ -106,7 +99,7 @@ public class UtilityTesting
         var res = BitConverter.ToString(result).Replace("-","");
         
         // found on https://emn178.github.io/online-tools/shake_256.html
-        var expected = "58D33210B506D65D49BAAD0E4F05BE8E593DCB2860F1673BF3D90822771FA";
+        var expected = "58d33210b506d65d49baad0e4f05be8e593dcb2860f1673bf3d90822771fabd0".ToUpper();
         Assert.Contains(expected, res);
     }
 }

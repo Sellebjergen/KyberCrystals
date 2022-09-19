@@ -9,13 +9,6 @@ namespace Tests;
 public class PolynomiaTests
 {
     [Fact]
-    public void Parse()
-    {
-        // TODO: Create some better tests than those for the Parse function
-
-    }
-
-    [Fact]
     public void RunningCbd_TwiceOnSameInput_GivesSameOutput()
     {
         var p = new Constants().Kyber512();
@@ -98,7 +91,7 @@ public class PolynomiaTests
         var p = new Polynomial(new List<BigInteger> { 1, 0, 0, 0});
         p.RemoveTrailingZeros();
         
-        Assert.Equal(1, p.GetDegree());
+        Assert.Equal(1, p.GetLengthOfPolynomial());
     }
 
     [Fact]
@@ -200,37 +193,12 @@ public class PolynomiaTests
     {
         var param = new Constants().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
+        
         var poly1 = new Polynomial(new List<BigInteger> {1, 2, param.Q - 1});
         var poly2 = new Polynomial(new List<BigInteger> { 1, 1, param.Q - 1});
 
         var res = rq.Sub(poly1, poly2);
         var expectedPoly = new Polynomial(new List<BigInteger> { 0, 1});
-        
-        Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
-    }
-
-    [Fact]
-    public void Test_PolynomialLongDivision()
-    {
-        var param = new Constants().Kyber512();
-        var rq = new PolynomialRing(param.Q, 1);
-        var p = new Polynomial(new List<BigInteger> {1, 3, 1});     // 1 + 3x + x^2
-
-        var res = rq.ModPoly(p);
-        var expectedPoly = new Polynomial(new List<BigInteger> { 3328 });
-        
-        Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
-    }
-    
-    [Fact]
-    public void Test2_PolynomialLongDivision()
-    {
-        var param = new Constants().Kyber512();
-        var rq = new PolynomialRing(param.Q, 1);
-        var p = new Polynomial(new List<BigInteger> {2, 3, 1});     // 1 + 3x + x^2
-
-        var res = rq.ModPoly(p);
-        var expectedPoly = new Polynomial(new List<BigInteger> { 0 });
         
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }

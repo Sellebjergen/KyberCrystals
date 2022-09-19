@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace KyberCrystals;
 
-public class Polynomial
+public class Polynomial : IPolynomial
 {
     private readonly List<BigInteger> _coefficients;
 
@@ -45,35 +45,15 @@ public class Polynomial
         return res;
     }
 
-    public int GetDegree()
+    // todo: check use cases for this. Does it apply though it is not the degree?
+    public int GetLengthOfPolynomial()
     {
         return _coefficients.Count;
     }
-    
-    public void ReduceToNttForm()
+
+    public int GetDegree()
     {
-        var k = 1;
-        var l = 128;
-        while (l >= 2)
-        {
-            var start = 0;
-            while (start < 256)
-            {
-                var zeta = Constants.NttZetas[k];
-                k += 1;
-                var counter = 0;
-                for (var j = start; j < start + l; j += 1)
-                {
-                    var t = Utils.NttMult(zeta, _coefficients[j + l]);
-                    _coefficients[j + l] = _coefficients[j] - t;
-                    _coefficients[j] += t;
-                }
-
-                start = l + counter + 1;
-            }
-
-            l >>= 1;
-        }
+        return _coefficients.Count - 1;
     }
 
     public void RemoveTrailingZeros()

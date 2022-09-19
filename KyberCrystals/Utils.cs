@@ -49,11 +49,11 @@ public static class Utils
             throw new ArgumentException("The byte array need to be of length 32");
 
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
-        var result = new byte[length];
         
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b);
         
+        var result = new byte[length];
         hashAlgorithm.DoFinal(result, 0, length);
         return result;
     }
@@ -83,17 +83,5 @@ public static class Utils
         hashAlgorithm.DoFinal(result, 0, length);
         
         return result;
-    }
-
-    public static BigInteger montgomery_reduce(BigInteger a)
-    {
-        // TODO: Constants taken from the article, should be replaced by something more appropriate.
-        var math = BigInteger.Pow(2, 16); // TODO: this seems inefficient, to save 16 bit number in bigint.
-        return BigInteger.ModPow(a * math, -1, 3329);
-    }
-
-    public static BigInteger NttMult(BigInteger a, BigInteger b)
-    {
-        return montgomery_reduce(a * b);
     }
 }

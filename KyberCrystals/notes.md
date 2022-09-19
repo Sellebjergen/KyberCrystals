@@ -3,13 +3,11 @@ These are my notes for the PQP project regarding coding of the CRYSTALS-kyber al
 The specification can be found on the following link https://pq-crystals.org/kyber/data/kyber-specification-round3-20210804.pdf.
 
 ## TODO:
-* Clean the code and the unit tests.
-* Implement modulo for functions
-  * 2 versions
 * euclidian gcd function implementation???
 * Read this seemingly good introduction to Kyber https://cryptopedia.dev/posts/kyber/
 * (maybe) A bit of theory about how AES works and why that is quantum secure?
 * Recovering the private key requires to solve the module-learning-with-errors problem
+* KAT tests (found in the article)
 
 ## Questions for Diego
 1. first
@@ -24,8 +22,15 @@ The specification can be found on the following link https://pq-crystals.org/kyb
 
 2. Second
    * We agree that it is only during multiplication we get a polynomia of a higher degree?
+   * Just making sure that I understand polynomial rings correct
+   * Seems like python and java implementation differ in zeta's calculated.
+     * How are the zetas calculated? Maybe I need montgomery spaces?
+   * Check the missing test in NttPolynomialTesting
+   * I cannot make the NTT(Ntt_inv(polynomial)) function work correctly.
+   * Where do I find the shake128 xof test vectors? (I haven't been able to find them again)
+   * is x^17 in the ring x^17 + 1?
 
-## Questions for Søren
+## Questions for Søren / Alex
 * Usage of Get property in C#
 * How do I organise unit tests? One test for Add, Mult etc and then a lot of theories? - seems to give bad naming as to what is wrong.
 
@@ -33,6 +38,9 @@ The specification can be found on the following link https://pq-crystals.org/kyb
 * https://www.nayuki.io/page/number-theoretic-transform-integer-dft
 * https://codeforces.com/blog/entry/48798
 * https://dsprenkels.com/ntt.html
+
+### NTT-precomputing
+* https://www.springerprofessional.de/en/preprocess-then-ntt-technique-and-its-applications-to-kyber-and-/16564234
 
 ## Montgomery reduction
 * https://cryptography.fandom.com/wiki/Montgomery_reduction
@@ -42,6 +50,9 @@ The specification can be found on the following link https://pq-crystals.org/kyb
 
 ## People trying to use PQP encryption
 * https://blog.dashlane.com/lets-get-ready-for-post-quantum-cryptography-in-dashlane/
+
+## Polynomial division strategies
+* https://flexbooks.ck12.org/cbook/ck-12-algebra-i-concepts-honors/section/7.13/primary/lesson/long-division-and-synthetic-division-alg-i-hnrs/
 
 ## Current plan for project
 1. Make an implementation of the CRYSTALS-Kyber
