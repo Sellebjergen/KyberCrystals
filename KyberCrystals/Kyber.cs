@@ -19,7 +19,7 @@ public class Kyber
         var n = 0;
         
         // Generate the A matrix
-        var a = GenerateMatrix(rho, _params.K);
+        var _A = GenerateMatrix(rho, _params.K);
         
         // Sample s
         var s = new Polynomial[] { };

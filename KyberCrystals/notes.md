@@ -21,14 +21,12 @@ The specification can be found on the following link https://pq-crystals.org/kyb
     * How to calculate A o s + e, we agree that is just normal matrix multiplication?
 
 2. Second
-   * We agree that it is only during multiplication we get a polynomia of a higher degree?
-   * Just making sure that I understand polynomial rings correct
-   * Seems like python and java implementation differ in zeta's calculated.
-     * How are the zetas calculated? Maybe I need montgomery spaces?
-   * Check the missing test in NttPolynomialTesting
+   * Seems like python and java implementation differ in zeta's calculated, how the fuck?
+   * We agree that zeta is 17 at it lowest and we work in mod 3329, then we {17, 17^3, 17^5, ... , 17^255} mod q will be the set of zetas?
+   * Check the skipped tests in NttPolynomialTesting
    * I cannot make the NTT(Ntt_inv(polynomial)) function work correctly.
    * Where do I find the shake128 xof test vectors? (I haven't been able to find them again)
-   * is x^17 in the ring x^17 + 1?
+   * Is x^17 in the ring x^17 + 1?
 
 ## Questions for Søren / Alex
 * Usage of Get property in C#

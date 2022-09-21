@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Numerics;
 using KyberCrystals;
 using Xunit;
-
-// TODO: give in different polynomial rings
 
 namespace Tests;
 
