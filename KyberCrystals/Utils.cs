@@ -84,4 +84,19 @@ public static class Utils
         
         return result;
     }
+
+    public static int GetRootOfUnity(int n, int q) // n is degree of mod poly and q is the modulus of the ring.
+    {
+        var i = 2;
+        while (true)
+        {
+            var math = BigInteger.ModPow(i, n, q);
+            if (math == 1)
+            {
+                return i;
+            }
+
+            i += 1;
+        }
+    }
 }

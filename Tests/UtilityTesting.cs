@@ -102,4 +102,18 @@ public class UtilityTesting
         var expected = "58d33210b506d65d49baad0e4f05be8e593dcb2860f1673bf3d90822771fabd0".ToUpper();
         Assert.Contains(expected, res);
     }
+
+    [Fact]
+    public void RootOfUnity_Returns17_ForKyberRing()
+    {
+        var res = Utils.GetRootOfUnity(256, 3329);
+        Assert.Equal(17, res); // 17 from article
+    }
+
+    [Fact]
+    public void RootOfUnity_ReturnsX_ForBabyKyberRing()
+    {
+        var res = Utils.GetRootOfUnity(4, 17);
+        Assert.Equal(4, res); // 4 from blog post calculation
+    }
 }
