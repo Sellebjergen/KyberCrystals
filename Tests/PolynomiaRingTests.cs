@@ -175,4 +175,30 @@ public class PolynomialRingTests {
         
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }
+
+    [Fact]
+    public void Test1_DuringDebuggingOfArticleProduct()
+    {
+        var p1 = new Polynomial(new List<BigInteger>{ -17, 0, 1 });
+        var p2 = new Polynomial(new List<BigInteger>{ -3312, 0, 1 });
+        var rq = new PolynomialRing(3329, 256); // todo: var kyber params (maybe add to testhelper that I can this ring?
+
+        var res = rq.Mult(p1, p2);
+
+        var expected = new Polynomial(new List<BigInteger> { 3040, 0, 0, 0,1});
+        Assert.True(TestHelpers.ComparePolynomials(expected, res));
+    }
+
+    [Fact]
+    public void Test2_DuringDebuggingOfArticleProduct()
+    {
+        var p1 = new Polynomial(new List<BigInteger>{ 2298, 0, 3040, 0,568,0,1 });
+        var p2 = new Polynomial(new List<BigInteger>{ -3281, 0, 1 });
+        var rq = new PolynomialRing(3329, 256); // todo: var kyber params (maybe add to testhelper that I can this ring?
+
+        var res = rq.Mult(p1, p2);
+
+        var expected = new Polynomial(new List<BigInteger> { 447, 0, 1742, 0, 343, 0, 616, 0, 1});
+        Assert.True(TestHelpers.ComparePolynomials(expected, res));
+    }
 }

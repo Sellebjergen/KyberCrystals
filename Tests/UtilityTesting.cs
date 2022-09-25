@@ -1,3 +1,4 @@
+using System.Numerics;
 using System.Text;
 using KyberCrystals;
 using Xunit;
@@ -111,9 +112,22 @@ public class UtilityTesting
     }
 
     [Fact]
-    public void RootOfUnity_ReturnsX_ForBabyKyberRing()
+    public void RootOfUnity_Returns4_ForBabyKyberRing()
     {
         var res = Utils.GetRootOfUnity(4, 17);
         Assert.Equal(4, res); // 4 from blog post calculation
+    }
+
+    [Fact]
+    public void Br7_reversesBits_GivesExpectedResult()
+    {
+        Assert.Equal(8, Utils.Br7(8));
+    }
+
+    [Fact]
+    public void Br7_reversed1_Gives2_32_minus_1()
+    {
+        // reversing 0000001 gives 1000000 2**7 = 64.
+        Assert.Equal(64, Utils.Br7(1));
     }
 }

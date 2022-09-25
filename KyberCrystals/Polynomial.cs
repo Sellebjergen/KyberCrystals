@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace KyberCrystals;
 
-public class Polynomial : IPolynomial
+public class Polynomial
 {
     private readonly List<BigInteger> _coefficients;
 
@@ -13,7 +13,7 @@ public class Polynomial : IPolynomial
 
     public BigInteger GetCoefficient(int i)
     {
-        try 
+        try
         {
             var res = _coefficients[i];
             return res;
@@ -36,7 +36,7 @@ public class Polynomial : IPolynomial
 
         var res = new List<BigInteger>(_coefficients);
         var diff = amount - _coefficients.Count;
-        
+
         for (var i = 0; i < diff; i++)
         {
             res.Add(new BigInteger(0));

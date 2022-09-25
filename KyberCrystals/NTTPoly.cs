@@ -30,7 +30,7 @@ public static class NttPoly
         return montgomeryReduce((long) ((long) a * (long) b));
     }
 
-    public static short[] ntt(short[] r) {
+    public static short[] Ntt(short[] r) {
         int j = 0;
         int k = 1;
         for (int l = 128; l >= 2; l >>= 1) {
@@ -48,7 +48,7 @@ public static class NttPoly
         return r;
     }
 
-    public static short[] invNTT(short[] r) {
+    public static short[] InvNtt(short[] r) {
         int j = 0;
         int k = 0;
         for (int l = 2; l <= 128; l <<= 1) {

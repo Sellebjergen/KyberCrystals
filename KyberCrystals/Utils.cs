@@ -2,12 +2,12 @@ using System.Numerics;
 
 namespace KyberCrystals;
 
-public static class Utils 
+public static class Utils
 {
     public static byte[] GetRandomBytes(int amount)
     {
         var random = new Random();
-        
+
         var bytes = new byte[amount];
         random.NextBytes(bytes);
 
@@ -17,7 +17,7 @@ public static class Utils
     public static (byte[], byte[]) G(byte[] input)
     {
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.Sha3Digest(512);
-        
+
         hashAlgorithm.BlockUpdate(input, 0, input.Length);
 
         var result = new byte[64];
@@ -34,7 +34,7 @@ public static class Utils
     public static byte[] H(byte[] input)
     {
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.Sha3Digest(256);
-        
+
         hashAlgorithm.BlockUpdate(input, 0, input.Length);
 
         var result = new byte[32];
@@ -45,14 +45,14 @@ public static class Utils
 
     public static byte[] Prf(byte[] bytes, byte b, int length)
     {
-        if (bytes.Length != 32) 
+        if (bytes.Length != 32)
             throw new ArgumentException("The byte array need to be of length 32");
 
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
-        
+
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b);
-        
+
         var result = new byte[length];
         hashAlgorithm.DoFinal(result, 0, length);
         return result;
@@ -62,15 +62,15 @@ public static class Utils
     {
         if (bytes.Length != 32)
             throw new ArgumentException("The byte array need to be of length 32");
-        
+
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(128);
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b1);
         hashAlgorithm.Update(b2);
-        
+
         var result = new byte[length];
         hashAlgorithm.DoFinal(result, 0, length);
-        
+
         return result;
     }
 
@@ -81,7 +81,7 @@ public static class Utils
 
         var result = new byte[length];
         hashAlgorithm.DoFinal(result, 0, length);
-        
+
         return result;
     }
 
@@ -98,5 +98,17 @@ public static class Utils
 
             i += 1;
         }
+    }
+
+    public static int Br7(int num)
+    {
+        if (num is > 127 or < 0)
+            throw new ArgumentException("The number cannot fit in 7 bits. Choose a number x, 0 <= x <= 127");
+
+        var bits = Convert.ToString(num, 2).PadLeft(7, '0').ToCharArray();
+        Array.Reverse(bits);
+        var reversed = Convert.ToInt32(new string(bits), 2);
+
+        return reversed;
     }
 }

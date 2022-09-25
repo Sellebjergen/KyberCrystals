@@ -5,8 +5,8 @@ namespace KyberCrystals;
 
 public class PolynomialRing
 {
-    public BigInteger Q { get;  }
-    public BigInteger N{ get; }
+    public BigInteger Q { get; }
+    public BigInteger N { get; }
     private readonly Polynomial _modPoly;
     private readonly IPolyModStrategy _polyModStrategy = new LongPolynomialDivision();
 
@@ -14,12 +14,13 @@ public class PolynomialRing
     {
         Q = q;
         N = n;
-        var coef = new List<BigInteger>{1};
-        
+        var coef = new List<BigInteger> { 1 };
+
         for (var i = 0; i < n - 1; i++)
         {
             coef.Add(BigInteger.Zero);
         }
+
         coef.Add(BigInteger.One);
         _modPoly = new Polynomial(coef);
     }
@@ -29,11 +30,12 @@ public class PolynomialRing
         var i = 0;
         var j = 0;
         var coefficients = new List<BigInteger>();
-        
+
         while (j < N)
         {
             var d1 = bytes[i] + 256 * (bytes[i + 1] % 16);
-            var d2 = (bytes[i + 1] / 16) + 16 * bytes[i + 2]; // should automatically use floor division as we work on ints.
+            var d2 = (bytes[i + 1] / 16) +
+                     16 * bytes[i + 2]; // should automatically use floor division as we work on ints.
 
             if (d1 < Q)
             {
@@ -57,7 +59,7 @@ public class PolynomialRing
     {
         var bits = new BitArray(bytes);
         var coefficients = new List<BigInteger>();
-        
+
         for (var i = 0; i < 256; i++)
         {
             var a = 0;
@@ -72,7 +74,7 @@ public class PolynomialRing
                         continue;
                 }
             }
-            
+
             var b = 0;
             for (var j = 0; j < eta; j++)
             {
@@ -98,7 +100,7 @@ public class PolynomialRing
     {
         var bits = new BitArray(bytes);
         var coefficients = new List<BigInteger>();
-        
+
         for (var i = 0; i < 256; i++)
         {
             var temp = 0.0;
@@ -114,7 +116,8 @@ public class PolynomialRing
                         continue;
                 }
             }
-            coefficients.Add((int) temp);
+
+            coefficients.Add((int)temp);
         }
 
         return new Polynomial(coefficients);
@@ -125,7 +128,7 @@ public class PolynomialRing
         var maxDeg = Math.Max(p1.GetLengthOfPolynomial(), p2.GetLengthOfPolynomial());
         var p1Coef = p1.GetPaddedCoefficients(maxDeg);
         var p2Coef = p2.GetPaddedCoefficients(maxDeg);
-        
+
         var result = new List<BigInteger> { };
         foreach (var (x, y) in p1Coef.Zip(p2Coef))
         {
@@ -139,11 +142,11 @@ public class PolynomialRing
     public Polynomial Mult(Polynomial p1, Polynomial p2)
     {
         var res = new List<BigInteger>();
-        for (var i = 0; i < Math.Pow(Math.Max(p1.GetLengthOfPolynomial(), p2.GetLengthOfPolynomial()), 2); i ++)
+        for (var i = 0; i < Math.Pow(Math.Max(p1.GetLengthOfPolynomial(), p2.GetLengthOfPolynomial()), 2); i++)
         {
             res.Add(BigInteger.Zero);
         }
-        
+
         for (var i = 0; i < p1.GetLengthOfPolynomial(); i++)
         {
             for (var j = 0; j < p2.GetLengthOfPolynomial(); j++)
