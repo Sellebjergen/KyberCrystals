@@ -29,17 +29,17 @@ public class Polynomial
         return _coefficients;
     }
 
-    public List<BigInteger> GetPaddedCoefficients(int amount)
+    public List<BigInteger> GetPaddedCoefficients(int totalLength)
     {
-        if (amount < _coefficients.Count)
+        if (totalLength < _coefficients.Count)
             throw new ArgumentException("Can't return coefficients shorter than the polynomial.");
 
         var res = new List<BigInteger>(_coefficients);
-        var diff = amount - _coefficients.Count;
+        var diff = totalLength - _coefficients.Count;
 
         for (var i = 0; i < diff; i++)
         {
-            res.Add(new BigInteger(0));
+            res.Add(BigInteger.Zero);
         }
 
         return res;
