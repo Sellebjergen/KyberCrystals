@@ -75,4 +75,25 @@ public class NttPolynomialTesting
         
         Assert.Equal(128, ntt.GetKyberNtt(p).Count);
     }
+
+    [Fact]
+    public void testing()
+    {
+        var p = new Polynomial(new List<BigInteger> { 1, 1, 1 });
+        var p_short = new short[256];
+        p_short[0] = 1;
+        p_short[1] = 1;
+        p_short[2] = 1;
+        
+        var x = NttPolyConverter.Ntt(p_short);
+        var z = NttPolyConverter.InvNtt(x);
+        var u = NttPolyConverter.FromMontgomery(z);
+        
+        Assert.True(u[0] == 1);
+        Assert.True(u[1] == 1);
+        Assert.True(u[2] == 1);
+        for (var i = 3; i < p_short.Length; i++) {
+            Assert.True(p_short[i] == 0);
+        }
+    }
 }

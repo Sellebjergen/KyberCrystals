@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace KyberCrystals;
 
-// TODO: maybe this should be ntt converter and instead ntt could be a better 
+// TODO: maybe this should be ntt converter and instead ntt could be another polynomial 
 
 public class NttPolynomial
 {
@@ -39,13 +39,15 @@ public class NttPolynomial
         var coef = p.GetPaddedCoefficients(256);
         var res = new List<Polynomial>();
 
-        for (var i = 0; i < 128; i++) {
+        for (var i = 0; i < 128; i++) 
+        {
             var sum = BigInteger.Zero;
             var sum2 = BigInteger.Zero;
             
             for (var j = 0; j < 128; j++)
             {
-                var zeta = BigInteger.Pow(Utils.GetRootOfUnity(_params.N, _params.Q), (2 * Utils.Br7(i) + 1) * j);
+                var zeta = 
+                    BigInteger.ModPow(Utils.GetRootOfUnity(_params.N, _params.Q), (2 * Utils.Br7(i) + 1) * j, _params.Q);
                 sum += coef[2 * j] * zeta;
                 sum2 += coef[2 * j + 1] * zeta;
             }
