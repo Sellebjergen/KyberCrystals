@@ -6,7 +6,7 @@ namespace KyberCrystals;
 
 public static class NttPolyConverter
 {
-    private static readonly short[] NttZetas = new short[]{
+    private static readonly short[] NttZetas = { // Uses mont with R = 2^16
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
         732, 608, 1787, 411, 3124, 1758, 1223, 652, 2777, 1015, 2036, 1491, 3047,
@@ -18,7 +18,7 @@ public static class NttPolyConverter
         1218, 1994, 2455, 220, 2142, 1670, 2144, 1799, 2051, 794, 1819, 2475, 2459,
         478, 3221, 3021, 996, 991, 958, 1869, 1522, 1628};
 
-    private static readonly short[] NttZetasInv = new short[]{
+    private static readonly short[] NttZetasInv = {
         1701, 1807, 1460, 2371, 2338, 2333, 308, 108, 2851, 870, 854, 1510, 2535,
         1278, 1530, 1185, 1659, 1187, 3109, 874, 1335, 2111, 136, 1215, 2945, 1465,
         1285, 2007, 2719, 2726, 2232, 2512, 75, 156, 3000, 2911, 2980, 872, 2685,
@@ -30,19 +30,21 @@ public static class NttPolyConverter
         829, 2946, 3065, 1325, 2756, 1861, 1474, 1202, 2367, 3147, 1752, 2707, 171,
         3127, 3042, 1907, 1836, 1517, 359, 758, 1441};
 
-    private static short ModQMulMont(short a, short b) {
-        return montgomeryReduce((long) ((long) a * (long) b));
+    private static short ModQMulMont(short a, short b) 
+    {
+        return MontgomeryReduce(a * (long) b);
     }
 
-    public static short[] Ntt(short[] r) {
-        int j = 0;
-        int k = 1;
-        for (int l = 128; l >= 2; l >>= 1) {
-            for (int start = 0; start < 256; start = j + l) {
-                short zeta = NttZetas[k];
-                k = k + 1;
+    public static short[] Ntt(short[] r) 
+    {
+        int j;
+        var k = 1;
+        for (var l = 128; l >= 2; l >>= 1) {
+            for (var start = 0; start < 256; start = j + l) {
+                var zeta = NttZetas[k];
+                k += 1;
                 for (j = start; j < start + l; j++) {
-                    short t = ModQMulMont(zeta, r[j + l]);
+                    var t = ModQMulMont(zeta, r[j + l]);
                     r[j + l] = (short) (r[j] - t);
                     r[j] = (short) (r[j] + t);
                 }
@@ -52,16 +54,17 @@ public static class NttPolyConverter
         return r;
     }
 
-    public static short[] InvNtt(short[] r) {
-        int j = 0;
-        int k = 0;
-        for (int l = 2; l <= 128; l <<= 1) {
-            for (int start = 0; start < 256; start = j + l) {
-                short zeta = NttZetasInv[k];
-                k = k + 1;
+    public static short[] InvNtt(short[] r) 
+    {
+        int j;
+        var k = 0;
+        for (var l = 2; l <= 128; l <<= 1) {
+            for (var start = 0; start < 256; start = j + l) {
+                var zeta = NttZetasInv[k];
+                k += 1;
                 for (j = start; j < start + l; j++) {
-                    short t = r[j];
-                    r[j] = barrettReduce((short) (t + r[j + l]));
+                    var t = r[j];
+                    r[j] = BarrettReduce((short) (t + r[j + l]));
                     r[j + l] = (short) (t - r[j + l]);
                     r[j + l] = ModQMulMont(zeta, r[j + l]);
                 }
@@ -73,8 +76,9 @@ public static class NttPolyConverter
         return r;
     }
 
-    public static short[] baseMultiplier(short a0, short a1, short b0, short b1, short zeta) {
-        short[] r = new short[2];
+    public static short[] baseMultiplier(short a0, short a1, short b0, short b1, short zeta) 
+    {
+        var r = new short[2];
         r[0] = ModQMulMont(a1, b1);
         r[0] = ModQMulMont(r[0], zeta);
         r[0] = (short) (r[0] + ModQMulMont(a0, b0));
@@ -82,10 +86,11 @@ public static class NttPolyConverter
         r[1] = (short) (r[1] + ModQMulMont(a1, b0));
         return r;
     }
-    
-    public static short montgomeryReduce(long a) {
-        short u = (short) (a * 62209); // todo 62209 -> param.qInv
-        int t = (int) (u * 3329); // todo 3329 -> param.q
+
+    private static short MontgomeryReduce(long a) 
+    {
+        var u = (short) (a * 62209); // todo 62209 -> param.qInv
+        var t = u * 3329; // todo 3329 -> param.q
         t = (int) (a - t);
         t >>= 16; // TODO: this is due to montgomery factor of 2^16
 
@@ -94,25 +99,26 @@ public static class NttPolyConverter
         return (short) t;
     }
 
-    public static short barrettReduce(short a)
+    private static short BarrettReduce(short a)
     {
         short t;
-        long shift = (((long)1) << 26);
-        short v = (short)((shift + (3329 / 2)) / 3329); // todo 3329 -> param.q
+        const long shift = (long) 1 << 26;
+        var v = (short)((shift + (3329 / 2)) / 3329); // todo 3329 -> param.q
         t = (short)((v * a) >> 26);
         t = (short)(t * 3329); // todo 3329 -> param.q
         return (short)(a - t);
     }
 
-    public static short FromMontgomery(short a)
+    private static short FromMontgomery(short a)
     {
         return (short) BigInteger.ModPow(a * 169, 1, 3329); // params 3329 and inverse mont 169
     }
     
-    public static short[] FromMontgomery(short[] p) {
+    public static short[] FromMontgomery(short[] p) 
+    {
         for (var i = 0; i < 256; i++)
         {
-            p[i] = NttPolyConverter.FromMontgomery(p[i]);
+            p[i] = FromMontgomery(p[i]);
         }
 
         return p;
