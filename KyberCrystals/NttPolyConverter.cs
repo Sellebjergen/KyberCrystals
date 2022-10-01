@@ -6,7 +6,8 @@ namespace KyberCrystals;
 
 public static class NttPolyConverter
 {
-    private static readonly BigInteger[] NttZetas = { // Uses mont with R = 2^16
+    private static readonly List<BigInteger> NttZetas = new()
+    { // Uses mont with R = 2^16
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
         732, 608, 1787, 411, 3124, 1758, 1223, 652, 2777, 1015, 2036, 1491, 3047,
@@ -18,7 +19,7 @@ public static class NttPolyConverter
         1218, 1994, 2455, 220, 2142, 1670, 2144, 1799, 2051, 794, 1819, 2475, 2459,
         478, 3221, 3021, 996, 991, 958, 1869, 1522, 1628};
 
-    private static readonly BigInteger[] NttZetasInv = {
+    private static readonly List<BigInteger> NttZetasInv = new (){
         1701, 1807, 1460, 2371, 2338, 2333, 308, 108, 2851, 870, 854, 1510, 2535,
         1278, 1530, 1185, 1659, 1187, 3109, 874, 1335, 2111, 136, 1215, 2945, 1465,
         1285, 2007, 2719, 2726, 2232, 2512, 75, 156, 3000, 2911, 2980, 872, 2685,
@@ -35,7 +36,7 @@ public static class NttPolyConverter
         return MontgomeryReduce(a * b);
     }
 
-    public static BigInteger[] Ntt(BigInteger[] r) 
+    public static List<BigInteger> Ntt(List<BigInteger> r) 
     {
         int j;
         var k = 1;
@@ -46,7 +47,7 @@ public static class NttPolyConverter
                 for (j = start; j < start + l; j++) {
                     var t = ModQMulMont(zeta, r[j + l]);
                     r[j + l] = r[j] - t;
-                    r[j] = r[j] + t;
+                    r[j] += t;
                 }
             }
         }
@@ -54,7 +55,7 @@ public static class NttPolyConverter
         return r;
     }
 
-    public static BigInteger[] InvNtt(BigInteger[] r) 
+    public static List<BigInteger> InvNtt(List<BigInteger> r) 
     {
         int j;
         var k = 0;
@@ -76,14 +77,14 @@ public static class NttPolyConverter
         return r;
     }
 
-    public static BigInteger[] BaseMultiplier(BigInteger a0, BigInteger a1, BigInteger b0, BigInteger b1, BigInteger zeta) 
+    public static List<BigInteger> BaseMultiplier(BigInteger a0, BigInteger a1, BigInteger b0, BigInteger b1, BigInteger zeta) 
     {
-        var r = new BigInteger[2];
+        var r = new List<BigInteger>();
         r[0] = ModQMulMont(a1, b1);
         r[0] = ModQMulMont(r[0], zeta);
-        r[0] = r[0] + ModQMulMont(a0, b0);
+        r[0] += ModQMulMont(a0, b0);
         r[1] = ModQMulMont(a0, b1);
-        r[1] = r[1] + ModQMulMont(a1, b0);
+        r[1] += ModQMulMont(a1, b0);
         return r;
     }
 
@@ -105,7 +106,7 @@ public static class NttPolyConverter
         const long shift = (long) 1 << 26;
         var v = (BigInteger)((shift + (3329 / 2)) / 3329); // todo 3329 -> param.q
         t = (v * a) >> 26;
-        t = t * 3329; // todo 3329 -> param.q
+        t *= 3329; // todo 3329 -> param.q
         return a - t;
     }
 
@@ -114,14 +115,14 @@ public static class NttPolyConverter
         return BigInteger.ModPow(a * 169, 1, 3329); // params 3329 and inverse mont 169
     }
     
-    public static BigInteger[] FromMontgomery(BigInteger[] p) 
+    public static List<BigInteger> FromMontgomery(List<BigInteger> p) 
     {
         for (var i = 0; i < 256; i++)
         {
             p[i] = FromMontgomery(p[i]);
         }
         
-        for (var i = 0; i < p.Length; i++)
+        for (var i = 0; i < p.Count; i++)
         {
             if (p[i] < 0)
                 p[i] += 3329; // kyber param.q
