@@ -77,23 +77,38 @@ public class NttPolynomialTesting
     }
 
     [Fact]
-    public void testing()
+    public void Ntt_CanBeRevertedBy_InvNttAndFromMontgomery()
     {
         var p = new Polynomial(new List<BigInteger> { 1, 1, 1 });
-        var p_short = new short[256];
-        p_short[0] = 1;
-        p_short[1] = 1;
-        p_short[2] = 1;
         
-        var x = NttPolyConverter.Ntt(p_short);
+        var x = NttPolyConverter.Ntt(p.GetPaddedCoefficients(256).ToArray());
         var z = NttPolyConverter.InvNtt(x);
         var u = NttPolyConverter.FromMontgomery(z);
         
         Assert.True(u[0] == 1);
         Assert.True(u[1] == 1);
         Assert.True(u[2] == 1);
-        for (var i = 3; i < p_short.Length; i++) {
-            Assert.True(p_short[i] == 0);
+        for (var i = 3; i < p.GetPaddedCoefficients(256).Count; i++) {
+            Assert.True(p.GetCoefficient(i) == 0);
+        }
+    }
+    
+    [Fact]
+    public void Ntt_CanBeRevertedBy_InvNttAndFromMontgomery_only2Pols()
+    {
+        var p = new Polynomial(new List<BigInteger> { 2,2,2,2,2,2,2,2,2,2,2,2,2,2 });
+        
+        var x = NttPolyConverter.Ntt(p.GetPaddedCoefficients(256).ToArray());
+        var z = NttPolyConverter.InvNtt(x);
+        var u = NttPolyConverter.FromMontgomery(z);
+        
+        for (var i = 0; i < p.GetLengthOfPolynomial(); i++ )
+        {
+            Assert.True(u[i] == 2);
+        }
+        for (var i = p.GetLengthOfPolynomial(); i < 256; i++) 
+        {
+            Assert.True(u[i] == 0);
         }
     }
 }
