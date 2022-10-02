@@ -4,10 +4,10 @@ namespace KyberCrystals;
 
 // TODO: Currently 2^16 is hardcoded. This could be fun to get out of here.
 
-public static class NttPolyConverter
+public class NttPolyHelper
 {
-    private static readonly List<BigInteger> NttZetas = new()
-    { // Uses mont with R = 2^16
+    public readonly List<BigInteger> NttZetas = new()
+    { // Uses mont with R = 2^16 which have inverse 169 in mod 3329
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
         732, 608, 1787, 411, 3124, 1758, 1223, 652, 2777, 1015, 2036, 1491, 3047,
@@ -19,7 +19,7 @@ public static class NttPolyConverter
         1218, 1994, 2455, 220, 2142, 1670, 2144, 1799, 2051, 794, 1819, 2475, 2459,
         478, 3221, 3021, 996, 991, 958, 1869, 1522, 1628};
 
-    private static readonly List<BigInteger> NttZetasInv = new (){
+    private readonly List<BigInteger> NttZetasInv = new (){
         1701, 1807, 1460, 2371, 2338, 2333, 308, 108, 2851, 870, 854, 1510, 2535,
         1278, 1530, 1185, 1659, 1187, 3109, 874, 1335, 2111, 136, 1215, 2945, 1465,
         1285, 2007, 2719, 2726, 2232, 2512, 75, 156, 3000, 2911, 2980, 872, 2685,
@@ -31,12 +31,12 @@ public static class NttPolyConverter
         829, 2946, 3065, 1325, 2756, 1861, 1474, 1202, 2367, 3147, 1752, 2707, 171,
         3127, 3042, 1907, 1836, 1517, 359, 758, 1441};
 
-    private static BigInteger ModQMulMont(BigInteger a, BigInteger b) 
+    private BigInteger ModQMulMont(BigInteger a, BigInteger b) 
     {
         return MontgomeryReduce(a * b);
     }
 
-    public static List<BigInteger> Ntt(List<BigInteger> r) 
+    public List<BigInteger> Ntt(List<BigInteger> r) 
     {
         int j;
         var k = 1;
@@ -55,7 +55,7 @@ public static class NttPolyConverter
         return r;
     }
 
-    public static List<BigInteger> InvNtt(List<BigInteger> r) 
+    public List<BigInteger> InvNtt(List<BigInteger> r) 
     {
         int j;
         var k = 0;
@@ -77,22 +77,22 @@ public static class NttPolyConverter
         return r;
     }
 
-    public static List<BigInteger> BaseMultiplier(BigInteger a0, BigInteger a1, BigInteger b0, BigInteger b1, BigInteger zeta) 
+    public List<BigInteger> BaseMultiplier(BigInteger a0, BigInteger a1, BigInteger b0, BigInteger b1, BigInteger zeta)
     {
-        var r = new List<BigInteger>();
-        r[0] = ModQMulMont(a1, b1);
-        r[0] = ModQMulMont(r[0], zeta);
-        r[0] += ModQMulMont(a0, b0);
-        r[1] = ModQMulMont(a0, b1);
-        r[1] += ModQMulMont(a1, b0);
-        return r;
+        var res = new BigInteger[2];
+        res[0] = ModQMulMont(a1, b1);
+        res[0] = ModQMulMont(res[0], zeta);
+        res[0] += ModQMulMont(a0, b0);
+        res[1] = ModQMulMont(a0, b1);
+        res[1] += ModQMulMont(a1, b0);
+        return new List<BigInteger>(res);
     }
 
-    private static BigInteger MontgomeryReduce(BigInteger a) 
+    private BigInteger MontgomeryReduce(BigInteger a) 
     {
         var u = a * 62209; // todo 62209 -> param.qInv
         var t = u * 3329; // todo 3329 -> param.q
-        t = (a - t);
+        t = a - t;
         t >>= 16; // TODO: this is due to montgomery factor of 2^16
 
         if (t < 0) return t + 3329;
@@ -100,7 +100,7 @@ public static class NttPolyConverter
         return t;
     }
 
-    private static BigInteger BarrettReduce(BigInteger a)
+    private BigInteger BarrettReduce(BigInteger a)
     {
         BigInteger t;
         const long shift = (long) 1 << 26;
@@ -110,24 +110,57 @@ public static class NttPolyConverter
         return a - t;
     }
 
-    private static BigInteger FromMontgomery(BigInteger a)
+    public BigInteger FromMontgomery(BigInteger a)
     {
         return BigInteger.ModPow(a * 169, 1, 3329); // params 3329 and inverse mont 169
     }
     
-    public static List<BigInteger> FromMontgomery(List<BigInteger> p) 
+    public List<BigInteger> FromMontgomery(List<BigInteger> p) 
     {
         for (var i = 0; i < 256; i++)
         {
             p[i] = FromMontgomery(p[i]);
-        }
-        
-        for (var i = 0; i < p.Count; i++)
-        {
-            if (p[i] < 0)
-                p[i] += 3329; // kyber param.q
+            if (p[i] < 0) p[i] += 3329;
         }
 
         return p;
+    }
+    
+    public Polynomial Multiplication(List<BigInteger> p1NttCoef, List<BigInteger> p2NttCoef)
+    {
+        var res = new BigInteger[256];
+        for (var i = 0; i < 256 / 4; i++)
+        {
+            var x = BaseMultiplier(
+                p1NttCoef[4 * i + 0], 
+                p1NttCoef[4 * i + 1], 
+                p2NttCoef[4 * i + 0], 
+                p2NttCoef[4 * i + 1], 
+                NttZetas[64 + i]);
+            var y = BaseMultiplier(
+                p1NttCoef[4 * i + 2], 
+                p1NttCoef[4 * i + 3], 
+                p2NttCoef[4 * i + 2], 
+                p2NttCoef[4 * i + 3],
+                - NttZetas[64 + i]);
+            res[4 * i + 0] = x[0];
+            res[4 * i + 1] = x[1];
+            res[4 * i + 2] = y[0];
+            res[4 * i + 3] = y[1];
+        }
+
+        return new Polynomial(new List<BigInteger>(res));
+    }
+    
+    public Polynomial ReduceCoefHacks(Polynomial p)
+    {
+        var coef = p.GetCoefficients();
+        for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+        {
+            coef[i] = BigInteger.ModPow(coef[i] * (BigInteger) Math.Pow(2, 16), 1, 3329);  // todo: kyber params
+        }
+        var res = new Polynomial(coef);
+        res.RemoveTrailingZeros();
+        return res;
     }
 }
