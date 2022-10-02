@@ -9,11 +9,14 @@ public class KyberTests
     [Fact]
     public void KeyGen_Returns_CorrectLenghtPublicKey()
     {
+        var kyber = new Kyber(new Constants().Kyber512(), new PolynomialRing(3329, 256));
+        kyber.CPAPKE_KeyGen();
+        
         // TODO: Fill in some more interesting features right here.
     }
 
     [Fact]
-    public void TheModPoly_CanBeWrittenAs_ProductOf2DegPolynomias()
+    public void TheModPoly_CanBeWrittenAs_ProductOf2DegPolynomials()
     {
         var rq = new PolynomialRing(3329, 256); // todo: replace with kyber params dynamically.
         
