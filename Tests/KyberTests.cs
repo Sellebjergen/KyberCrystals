@@ -43,6 +43,7 @@ public class KyberTests
             0,
             1
         });
+        
         for (var i = 1; i < 128; i++)
         {
             var zeta = BigInteger.ModPow(rootOfUnity, 2 * Utils.Br7(i) + 1, 3329); // kyber param
@@ -52,5 +53,14 @@ public class KyberTests
 
         var expected = new Polynomial(new List<BigInteger>{0 }); // equal to x^256 + 1 in the ring!
         Assert.True(TestHelpers.ComparePolynomials(expected, sum));
+    }
+    
+    [Fact]
+    public void EncodeAndDecodePolynomial_Gives_SamePolynomial()
+    {
+        var p = new Polynomial(new List<BigInteger> { 1, 1, 1, });
+        var res = Utils.Decode(12, Utils.Encode(12, p));
+        
+        Assert.True(TestHelpers.ComparePolynomials(p, res));
     }
 }
