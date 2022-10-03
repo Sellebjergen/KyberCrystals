@@ -29,30 +29,30 @@ public class PolynomialRing
     {
         var i = 0;
         var j = 0;
-        var coefficients = new List<BigInteger>();
+        var coefficients = new BigInteger[256];
 
         while (j < N)
         {
             var d1 = bytes[i] + 256 * (bytes[i + 1] % 16);
-            var d2 = (bytes[i + 1] / 16) +
-                     16 * bytes[i + 2]; // should automatically use floor division as we work on ints.
+            var d2 = bytes[i + 1] / 16 + 16 * bytes[i + 2];
 
             if (d1 < Q)
             {
-                coefficients.Add(d1);
+                coefficients[j] = d1;
                 j += 1;
             }
 
-            if (d2 < Q && j < Q)
+            if (d2 < Q && j < N)
+                // todo: is the else above right? Without we can have polynomials of deg 256 not in rq.
             {
-                coefficients.Add(d2);
+                coefficients[j] = d2;
                 j += 1;
             }
 
             i += 3;
         }
 
-        return new Polynomial(coefficients);
+        return new Polynomial(new List<BigInteger>(coefficients));
     }
 
     public Polynomial Cbd(byte[] bytes, int eta)

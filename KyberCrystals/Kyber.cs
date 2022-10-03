@@ -21,7 +21,7 @@ public class Kyber
         var n = 0;
         
         // Generate the A matrix
-        var _A = GenerateMatrix(rho, _params.K); // should be NttPolynomials
+        var a = GenerateMatrix(rho, _params.K); // should be NttPolynomials
         
         // Sample s
         var s = new List<Polynomial>();
@@ -55,11 +55,11 @@ public class Kyber
         var t = new List<Polynomial>();
         for (var i = 0; i < _params.K; i++)
         {
-            var sum = new Polynomial(new List<BigInteger> { 0 });
+            var sum = new Polynomial(new List<BigInteger>());
             for (var j = 0; j < _params.K; j++)
             {
                 var tmp = ntt.Multiplication(
-                    _A[i, j].GetPaddedCoefficients(256), 
+                    a[i, j].GetPaddedCoefficients(256), 
                     sNtt[j].GetPaddedCoefficients(256));
                 var tmp2 = _rq.Add(tmp, eNtt[j]);
                 sum = _rq.Add(tmp2, sum);
@@ -67,17 +67,20 @@ public class Kyber
             t.Add(sum);
         }
 
-
-        var z = 0;
+        var pk = 0; //todo encode12 t
+        var sk = 0; //todo encode12 s
         // TODO: implement the rest of the key generation.
+
+        // return (pk, sk);
     }
 
-    private Polynomial[,] GenerateMatrix(byte[] rho, int k)
+    public Polynomial[,] GenerateMatrix(byte[] rho, int k)
     {
         var a = new Polynomial[k, k];
-        for (var i = 0; i < k - 1; i++)
-        { 
-            for (var j = 0; j < k - 1; j++)
+        
+        for (var i = 0; i < k; i++)
+        {
+            for (var j = 0; j < k; j++)
             {
                 var jByte = BitConverter.GetBytes(j).First();
                 var iByte = BitConverter.GetBytes(i).First();

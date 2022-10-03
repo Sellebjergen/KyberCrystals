@@ -14,6 +14,22 @@ public class KyberTests
         
         // TODO: Fill in some more interesting features right here.
     }
+    
+    [Fact]
+    public void MatrixGeneration_DoesNotInclude_nullValues()
+    {
+        var rq = new PolynomialRing(3329, 256);
+        var param = new Constants().Kyber512();
+        var d = Utils.GetRandomBytes(32);
+        var (rho, _) = Utils.G(d);
+        
+        var matrix = new Kyber(param, rq).GenerateMatrix(rho, param.K);
+        
+        Assert.NotNull(matrix[0,0]);
+        Assert.NotNull(matrix[0,1]);
+        Assert.NotNull(matrix[1,0]);
+        Assert.NotNull(matrix[1,1]);
+    }
 
     [Fact]
     public void TheModPoly_CanBeWrittenAs_ProductOf2DegPolynomials()

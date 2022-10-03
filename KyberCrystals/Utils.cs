@@ -111,4 +111,14 @@ public static class Utils
 
         return reversed;
     }
+    
+    public static byte[] Encode(Polynomial p)
+    {
+        return null;
+    }
+    
+    public static Polynomial Decode(byte[] bytes)
+    {
+        return null;
+    }
 }
