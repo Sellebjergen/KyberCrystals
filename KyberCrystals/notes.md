@@ -8,6 +8,11 @@ The specification can be found on the following link https://pq-crystals.org/kyb
 * (maybe) A bit of theory about how AES works and why that is quantum secure?
 * Recovering the private key requires to solve the module-learning-with-errors problem
 * KAT tests (found in the article)
+* Extend Ntt to not have montreal hardcoded, but instead generate the necessary values.
+
+## Reminders
+* There is a lot of theory behind which data types I have chosen for the implementation. Bigintegers does not seem necessary.
+* many of the values (such as l = 12) seem to be less optimized, why dont we use a short datatype, then we can have 16 bits instead of 12 bits making it easier for implementations and even allowing for larger values of q.
 
 ## Questions for Diego
 1. first
