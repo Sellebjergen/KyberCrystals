@@ -113,65 +113,50 @@ public static class Utils
         return reversed;
     }
 
-    public static byte[] Encode(int l, Polynomial p)
+    public static string Encode(int l, Polynomial p)
     {
         var coef = p.GetPaddedCoefficients(256).ToArray();
-        var res = new int[32 * l * 8];
+        var res = "";
         
         for (var i = 0; i < coef.Length; i++)
         {
-            var bit12Length = 
-                Convert.ToString((short)coef[i], 2)
-                       .PadLeft(12, '0')
-                       .Select(c => int.Parse(c.ToString()))
-                       .ToArray();
+            var bit12Length =
+                Convert.ToString((short) coef[i], 2).PadLeft(l, '0');
             
-            Array.Copy(bit12Length, 0, res, l * i, l);
+            res += bit12Length;
         }
-
-        // conversion to bytes
-        var z = 0;
         
-        return null;
-    }
-    
-    private static byte[] BitsToBytes(int[] bits)
-    {
-        if (bits.Any(b => b is < 0 or > 1))
-        {
-            throw new ArgumentException("Please give a list of bits!");
-        }
-
-        var bytes = new byte[32 * 12]; // todo: hardcoded values
-        for (var i = 0; i < bits.Length / 8; i++) {
-            var segment = new ArraySegment<int>(bits, i * 8, 8);
-
-            var sum = 0;
-            for (var j = 0; j < segment.Count; j++)
-            {
-                sum += (int) Math.Pow(2, i) * segment[i];
-            }
-        }
-
-        return null;
+        return res;
     }
 
-    public static Polynomial Decode(int l, byte[] bytes)
+    public static Polynomial Decode(int l, string bytes)
     {
-        var bits = new BitArray(bytes);
+        var bits = bytes;
         var coef = new BigInteger[256];
         
         for (var i = 0; i < 256; i++)
         {
             var sum = 0.0;
-            for (var j = 0; j < l - 1; j++)
+            for (var j = l-1; j >= 0; j--)
             {
-                var bit = bits[i * l + j] ? 1 : 0;
-                sum += bit * Math.Pow(2, j); // todo: could be implemented using shift?
+                var bit = bits[i * l + j] == '1' ? 1 : 0;
+                sum += bit * Math.Pow(2, 12-1-j); // todo: could be implemented using shift? 
             }
             coef[i] = (BigInteger) sum;
         }
 
         return new Polynomial(new List<BigInteger>(coef));
+    }
+    
+    public static string EncodePolynomialList(int l, List<Polynomial> polys)
+    {
+        var res = new string[polys.Count];
+        
+        for (var i = 0; i < polys.Count; i++)
+        {
+            res[i] = Encode(l, polys[i]);
+        }
+
+        return String.Join("", res);
     }
 }

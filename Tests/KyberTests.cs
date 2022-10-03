@@ -9,10 +9,21 @@ public class KyberTests
     [Fact]
     public void KeyGen_Returns_CorrectLenghtPublicKey()
     {
-        var kyber = new Kyber(new Constants().Kyber512(), new PolynomialRing(3329, 256));
-        kyber.CPAPKE_KeyGen();
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, sk) = kyber.CPAPKE_KeyGen();
         
-        // TODO: Fill in some more interesting features right here.
+        Assert.Equal(12 * param.K * param.N, pk.Length);
+    }
+    
+    [Fact]
+    public void KeyGen_Returns_CorrectLenghtPrivateKey()
+    {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, _) = kyber.CPAPKE_KeyGen();
+        
+        Assert.Equal(12 * param.K * param.N + 32 * 8, pk.Length);
     }
     
     [Fact]
@@ -60,6 +71,27 @@ public class KyberTests
     {
         var p = new Polynomial(new List<BigInteger> { 1, 1, 1, });
         var res = Utils.Decode(12, Utils.Encode(12, p));
+        res.RemoveTrailingZeros();
+        
+        Assert.True(TestHelpers.ComparePolynomials(p, res));
+    }
+    
+    [Fact]
+    public void EncodeAndDecodePolynomial_Gives_SamePolynomial2()
+    {
+        var p = new Polynomial(new List<BigInteger> { 2, 2, 2, });
+        var res = Utils.Decode(12, Utils.Encode(12, p));
+        res.RemoveTrailingZeros();
+        
+        Assert.True(TestHelpers.ComparePolynomials(p, res));
+    }
+    
+    [Fact]
+    public void EncodeAndDecodePolynomial_Gives_SamePolynomial3()
+    {
+        var p = new Polynomial(new List<BigInteger> { 3, 3, 3, });
+        var res = Utils.Decode(12, Utils.Encode(12, p));
+        res.RemoveTrailingZeros();
         
         Assert.True(TestHelpers.ComparePolynomials(p, res));
     }

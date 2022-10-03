@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Collections;
+using System.Numerics;
 
 namespace KyberCrystals;
 
@@ -13,7 +14,7 @@ public class Kyber
         _rq = rq; // TODO: Maybe this could be part of the params?
     }
 
-    public void CPAPKE_KeyGen()
+    public (string, string) CPAPKE_KeyGen()
     {
         var d = Utils.GetRandomBytes(32);
         var (rho, sigma) = Utils.G(d);
@@ -67,11 +68,22 @@ public class Kyber
             t.Add(sum);
         }
 
-        var pk = 0; //todo encode12 t
-        var sk = 0; //todo encode12 s
-        // TODO: implement the rest of the key generation.
+        for (var i = 0; i < sNtt.Count; i++)
+        {
+            sNtt[i] = _rq.ReduceModuloQ(sNtt[i]);
+        }
 
-        // return (pk, sk);
+        // converts rho to string array
+        var rho_str = "";
+        foreach (var v in new BitArray(rho))
+        {
+            rho_str += (bool) v ? '1' : '0';
+        }
+        
+        var pk = Utils.EncodePolynomialList(12, t) + rho_str;
+        var sk = Utils.EncodePolynomialList(12, sNtt);
+
+        return (pk, sk);
     }
 
     public Polynomial[,] GenerateMatrix(byte[] rho, int k)

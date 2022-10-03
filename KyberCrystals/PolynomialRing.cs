@@ -91,7 +91,7 @@ public class PolynomialRing
             coefficients.Add(a - b);
         }
 
-        return new Polynomial(coefficients);
+        return ReduceModuloQ(new Polynomial(coefficients));
     }
 
     // Note that l is the amount of 32 bytes we need to reach n.
@@ -193,7 +193,7 @@ public class PolynomialRing
         return _polyModStrategy.PolyMod(this, p, mod);
     }
 
-    private Polynomial ReduceModuloQ(Polynomial p)
+    public Polynomial ReduceModuloQ(Polynomial p)
     {
         var res = new List<BigInteger>();
 
