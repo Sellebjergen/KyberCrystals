@@ -74,13 +74,13 @@ public class Kyber
         }
 
         // converts rho to string array
-        var rho_str = "";
+        var rhoStr = "";
         foreach (var v in new BitArray(rho))
         {
-            rho_str += (bool) v ? '1' : '0';
+            rhoStr += (bool) v ? '1' : '0';
         }
         
-        var pk = Utils.EncodePolynomialList(12, t) + rho_str;
+        var pk = Utils.EncodePolynomialList(12, t) + rhoStr;
         var sk = Utils.EncodePolynomialList(12, sNtt);
 
         return (pk, sk);
@@ -203,7 +203,7 @@ public class Kyber
 
         return a;
     }
-    
+
     public Polynomial[,] GenerateTransposedMatrix(byte[] rho, int k)
     {
         var a = new Polynomial[k, k];
