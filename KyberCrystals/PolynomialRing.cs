@@ -57,6 +57,9 @@ public class PolynomialRing
 
     public Polynomial Cbd(byte[] bytes, int eta)
     {
+        if (bytes.Length != 64 * eta)
+            throw new ArgumentException($"The input bytes need to be of length {64 * eta} but it was {bytes.Length}");
+        
         var bits = new BitArray(bytes);
         var coefficients = new List<BigInteger>();
 

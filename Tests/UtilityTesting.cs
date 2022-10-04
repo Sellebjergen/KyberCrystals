@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Text;
 using KyberCrystals;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace Tests;
 
@@ -129,5 +128,34 @@ public class UtilityTesting
     {
         // reversing 0000001 gives 1000000 2**7 = 64.
         Assert.Equal(64, Utils.Br7(1));
+    }
+    
+    [Fact]
+    public void GetBytes_ReturnsCorrect_0Byte()
+    {
+        var a = "00000000";
+        var b = Utils.GetBytes(a);
+        
+        Assert.Equal(new byte[] { 0 }, b);
+    }
+    
+    [Fact]
+    public void GetBytes_ReturnsCorrect_0ByteWithLength32()
+    {
+        var a = "00000000";
+        var a32 = a + a + a + a;
+        var b = Utils.GetBytes(a32);
+        
+        Assert.Equal(new byte[] { 0,0,0,0 }, b);
+    }
+    
+    [Fact]
+    public void Compress_Decompress_GivesNumberClose()
+    {
+        var d = (short) 3;
+        var x = Utils.Compress(2, d);
+        var xB = Utils.Decompress((short) x, d);
+        
+        Assert.True(xB - x % 3329 < 3329 / (BigInteger) Math.Pow(2, d));
     }
 }

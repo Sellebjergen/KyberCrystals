@@ -7,17 +7,45 @@ namespace Tests;
 public class KyberTests
 {
     [Fact]
-    public void KeyGen_Returns_CorrectLenghtPublicKey()
-    {
+    public void CPAPKE_encrypt_decrypt() {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
+
+        var m = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var coins = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+        var _m = kyber.CPAPKE_decrypt(sk, c);
         
-        Assert.Equal(12 * param.K * param.N, pk.Length);
+        Assert.Equal(m, _m);
     }
     
     [Fact]
-    public void KeyGen_Returns_CorrectLenghtPrivateKey()
+    public void CPAPKE_encrypt_returns_CorrectSizeCiphertext()
+    {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, _) = kyber.CPAPKE_KeyGen();
+
+        var m = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var coins = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+
+        Assert.Equal(param.Du * param.K * param.N + param.Dv * param.N, c.Length);
+    }
+    
+    [Fact]
+    public void KeyGen_Returns_CorrectLengthSecretKey()
+    {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (_, sk) = kyber.CPAPKE_KeyGen();
+        
+        Assert.Equal(12 * param.K * param.N, sk.Length);
+    }
+    
+    [Fact]
+    public void KeyGen_Returns_CorrectLengthPublicKey()
     {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));

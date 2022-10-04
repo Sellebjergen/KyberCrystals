@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Net;
 using System.Numerics;
 
 namespace KyberCrystals;
@@ -44,19 +45,29 @@ public static class Utils
         return result;
     }
 
-    public static byte[] Prf(byte[] bytes, byte b, int length)
+    public static byte[] Prf(byte[] bytes, byte b, int length = 0)
     {
         if (bytes.Length != 32)
             throw new ArgumentException("The byte array need to be of length 32");
+        if (length < 0)
+            throw new ArgumentException("The length must be a positive number!"); // use -1 for when no number is set
 
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
 
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b);
-
-        var result = new byte[length];
-        hashAlgorithm.DoFinal(result, 0, length);
-        return result;
+        
+        if (length == 0)
+        {
+            var result = new byte[hashAlgorithm.GetByteLength()];
+            hashAlgorithm.DoFinal(result, 0);
+            return result;
+        }
+        else {
+            var result = new byte[length];
+            hashAlgorithm.DoFinal(result, 0, length);
+            return result;
+        }
     }
 
     public static byte[] Xof(byte[] bytes, byte b1, byte b2, int length)
@@ -128,6 +139,17 @@ public static class Utils
         
         return res;
     }
+    
+    public static string[] Encode(int l, Polynomial[] polys)
+    {
+        var res = new string[polys.Length];
+        for (var i = 0; i < polys.Length; i++)
+        {
+            res[i] = Encode(l, polys[i]);
+        }
+        
+        return res;
+    }
 
     public static Polynomial Decode(int l, string bytes)
     {
@@ -158,5 +180,66 @@ public static class Utils
         }
 
         return String.Join("", res);
+    }
+
+    public static byte[] GetBytes(string bitString)
+    {
+        return Enumerable.Range(0, bitString.Length / 8).Select(pos => Convert.ToByte(
+            bitString.Substring(pos * 8, 8),
+            2)
+        ).ToArray();
+    }
+    
+    public static BigInteger Compress(short x, short d)
+    {
+        return BigInteger.ModPow((BigInteger) Math.Pow(2, d) / 3329 * x, 1, 2); // todo: kyber param
+    }
+    
+    public static Polynomial Compress(Polynomial p, short d)
+    {
+        var coef = p.GetCoefficients();
+        for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+        {
+            coef[i] = Compress((short) coef[i], d);
+        }
+        return new Polynomial(coef);
+    }
+    
+    public static Polynomial[] Compress(Polynomial[] polys, short d)
+    {
+        var res = new Polynomial[polys.Length];
+        for (var i = 0; i < polys.Length; i++)
+        {
+            res[i] = Compress(polys[i], d);
+        }
+
+        return res;
+    }
+    
+    public static BigInteger Decompress(short x, short d)
+    {
+        return (BigInteger) (3329 /Math.Pow(2, d)) * x;
+    }
+    
+    public static Polynomial Decompress(Polynomial p, short d)
+    {
+        var coef = p.GetCoefficients();
+        for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+        {
+            coef[i] = Decompress((short) coef[i], d);
+        }
+
+        return new Polynomial(coef);
+    }
+    
+    public static Polynomial[] Decompress(Polynomial[] polys, short d)
+    {
+        var res = new Polynomial[polys.Length];
+        for (var i = 0; i < polys.Length; i++)
+        {
+            res[i] = Decompress(polys[i], d);
+        }
+
+        return res;
     }
 }

@@ -6,7 +6,7 @@ namespace KyberCrystals;
 
 public class NttPolyHelper
 {
-    public readonly List<BigInteger> NttZetas = new()
+    public readonly List<BigInteger> NttZetas = new() // calc all of these dynamically.
     { // Uses mont with R = 2^16 which have inverse 169 in mod 3329
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
@@ -19,7 +19,7 @@ public class NttPolyHelper
         1218, 1994, 2455, 220, 2142, 1670, 2144, 1799, 2051, 794, 1819, 2475, 2459,
         478, 3221, 3021, 996, 991, 958, 1869, 1522, 1628};
 
-    private readonly List<BigInteger> NttZetasInv = new (){
+    public readonly List<BigInteger> NttZetasInv = new (){
         1701, 1807, 1460, 2371, 2338, 2333, 308, 108, 2851, 870, 854, 1510, 2535,
         1278, 1530, 1185, 1659, 1187, 3109, 874, 1335, 2111, 136, 1215, 2945, 1465,
         1285, 2007, 2719, 2726, 2232, 2512, 75, 156, 3000, 2911, 2980, 872, 2685,
@@ -76,7 +76,7 @@ public class NttPolyHelper
         }
         return r;
     }
-
+    
     public List<BigInteger> BaseMultiplier(BigInteger a0, BigInteger a1, BigInteger b0, BigInteger b1, BigInteger zeta)
     {
         var res = new BigInteger[2];
