@@ -24,7 +24,7 @@ public static class TestHelpers
     {
         if (p1.GetLengthOfPolynomial() != p2.GetLengthOfPolynomial())
             return false;
-        
+
         for (var i = 0; i < p1.GetLengthOfPolynomial(); i++)
         {
             if (p1.GetCoefficient(i) != p2.GetCoefficient(i))
@@ -36,8 +36,8 @@ public static class TestHelpers
 
     public static Polynomial GetStandardModPoly(int n)
     {
-        var coef = new List<BigInteger>{1};
-        
+        var coef = new List<BigInteger> { 1 };
+
         for (var i = 0; i < n - 1; i++)
         {
             coef.Add(BigInteger.Zero);
@@ -48,12 +48,12 @@ public static class TestHelpers
 
     public static bool ComparePolynomialLists(List<Polynomial> p, List<Polynomial> p2)
     {
-        if (p.Count != p2.Count) 
+        if (p.Count != p2.Count)
             return false;
 
         for (var i = 0; i < p.Count - 1; i++)
         {
-            if (!ComparePolynomials(p[i], p2[i])) 
+            if (!ComparePolynomials(p[i], p2[i]))
                 return false;
         }
 

@@ -13,7 +13,16 @@ public class Kyber
         _params = p;
         _rq = rq; // TODO: Maybe this could be part of the params?
     }
+    
+    public (string, string) CCAKEM_keygen()
+    {
+        var z = Utils.GetRandomBytes(32);
+        var (pk, skPrime) = CPAPKE_KeyGen();
 
+        
+        return (null, null);
+    }
+    
     public (string, string) CPAPKE_KeyGen()
     {
         var d = Utils.GetRandomBytes(32);
@@ -119,7 +128,8 @@ public class Kyber
         var ntt = new NttPolyHelper();
         var coinsNtt = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
-            coinsNtt[i] = new Polynomial(ntt.Ntt(r[i].GetPaddedCoefficients(256))); // todo: probably this could be optimized with helper functions
+            coinsNtt[i] = new Polynomial(ntt.Ntt(r[i].GetPaddedCoefficients(256))); 
+        // todo: probably this could be optimized with helper functions
         
         // calculate value u
         var uNtt = new List<Polynomial>();
