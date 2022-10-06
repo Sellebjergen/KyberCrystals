@@ -70,7 +70,7 @@ public static class Utils
         }
     }
 
-    public static byte[] Xof(byte[] bytes, byte b1, byte b2, int length)
+    public static byte[] Xof(byte[] bytes, byte b1, byte b2, int length = 0)
     {
         if (bytes.Length != 32)
             throw new ArgumentException("The byte array need to be of length 32");
@@ -82,17 +82,26 @@ public static class Utils
 
         var result = new byte[length];
         hashAlgorithm.DoFinal(result, 0, length);
-
+        
         return result;
     }
 
-    public static byte[] Kdf(byte[] bytes, int length)
+    public static byte[] Kdf(byte[] bytes, int length = 0)
     {
         var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
 
-        var result = new byte[length];
-        hashAlgorithm.DoFinal(result, 0, length);
+        byte[] result;
+        if (length == 0)
+        {
+            result = new byte[hashAlgorithm.GetByteLength()];
+            hashAlgorithm.DoFinal(result, 0);
+        }
+        else
+        {
+            result = new byte[length];
+            hashAlgorithm.DoFinal(result, 0, length);
+        }
 
         return result;
     }

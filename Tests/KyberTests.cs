@@ -9,6 +9,16 @@ namespace Tests;
 public class KyberTests
 {
     [Fact]
+    public void CCAKEM_encrypt_ReturnsCorrectSizeCipherText() {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, _) = kyber.CCAKEM_keygen();
+        var (c, _) = kyber.CCAKEM_encrypt(pk);
+        
+        Assert.Equal(param.Du * param.K * param.N + param.Dv * param.N, c.Length);
+    }
+    
+    [Fact]
     public void CCAKEM_keygen_Returns_CorrectlySizedPublicKey() {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));

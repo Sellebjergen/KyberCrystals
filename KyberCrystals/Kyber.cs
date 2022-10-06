@@ -24,6 +24,30 @@ public class Kyber
         return (pk, sk);
     }
     
+    public (string, string) CCAKEM_encrypt(string pk)
+    {
+        var m = Utils.GetRandomBytes(32);
+        m = Utils.H(m);
+        
+        // todo: append concat bytes lists function.
+        var hPk = Utils.GetBytes(pk);
+        var mHpk = new byte[m.Length + hPk.Length];
+        m.CopyTo(mHpk, 0);
+        hPk.CopyTo(mHpk, m.Length);
+        
+        var (kPrime, r) = Utils.G(mHpk);
+        var c = CPAPKE_encrypt(pk, Utils.BytesToString(m), Utils.BytesToString(r));
+        var hC = Utils.H(Utils.GetBytes(c));
+        
+        var kHc = new byte[kPrime.Length + hC.Length];
+        kPrime.CopyTo(kHc, 0);
+        hC.CopyTo(kHc, kPrime.Length);
+        
+        var k = Utils.Kdf(kHc);
+
+        return (c, Utils.BytesToString(k));
+    }
+
     public (string, string) CPAPKE_KeyGen()
     {
         var d = Utils.GetRandomBytes(32);
