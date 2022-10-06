@@ -4,8 +4,28 @@ using Xunit;
 
 namespace Tests;
 
+// TODO: the tests in here expects the results to be in strings containing bits, thus a factor 8 is needed at all times.
+
 public class KyberTests
 {
+    [Fact]
+    public void CCAKEM_keygen_Returns_CorrectlySizedPublicKey() {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, _) = kyber.CCAKEM_keygen();
+
+        Assert.Equal(12 * param.K * param.N + (32 * 8), pk.Length);
+    }
+    
+    [Fact]
+    public void CCAKEM_keygen_Returns_CorrectlySizedSecretKey() {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (_ , sk) = kyber.CCAKEM_keygen();
+
+        Assert.Equal(24 * param.K * param.N + (96 * 8), sk.Length);
+    }
+    
     [Fact]
     public void CPAPKE_encrypt_decrypt_512()
     {

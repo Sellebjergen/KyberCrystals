@@ -19,8 +19,9 @@ public class Kyber
         var z = Utils.GetRandomBytes(32);
         var (pk, skPrime) = CPAPKE_KeyGen();
 
+        var sk = skPrime + pk + Utils.BytesToString(Utils.H(Utils.GetBytes(pk))) + Utils.BytesToString(z);
         
-        return (null, null);
+        return (pk, sk);
     }
     
     public (string, string) CPAPKE_KeyGen()

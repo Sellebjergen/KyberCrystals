@@ -242,4 +242,19 @@ public static class Utils
 
         return res;
     }
+
+    public static string BytesToString(byte[] p0)
+    {
+        var bits = new BitArray(p0);
+        var res = "";
+        for (var i = 0; i < bits.Length; i++)
+        {
+            if (bits[i]) 
+                res += "1";
+            else 
+                res += "0";
+        }
+
+        return res;
+    }
 }
