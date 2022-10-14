@@ -48,6 +48,13 @@ public class Kyber
         return (c, Utils.BytesToString(k));
     }
 
+    public string CCAKEM_decrypt(string c, string sk)
+    {
+        // todo: make this.
+        
+        return "";
+    }
+
     public (string, string) CPAPKE_KeyGen()
     {
         var d = Utils.GetRandomBytes(32);
@@ -197,7 +204,7 @@ public class Kyber
     
     public string CPAPKE_decrypt(string sk, string c)
     {
-        var ntt = new NttPolyHelper();
+        var ntt = new NttPolyHelper(); // todo: instantiate in the constructor instead.
         
         if (sk.Length != 12 * _params.K * _params.N)
             throw new ArgumentException(

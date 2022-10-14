@@ -9,33 +9,36 @@ namespace Tests;
 public class KyberTests
 {
     [Fact]
-    public void CCAKEM_encrypt_ReturnsCorrectSizeCipherText() {
+    public void CCAKEM_encrypt_ReturnsCorrectSizeCipherText()
+    {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, _) = kyber.CCAKEM_keygen();
         var (c, _) = kyber.CCAKEM_encrypt(pk);
-        
+
         Assert.Equal(param.Du * param.K * param.N + param.Dv * param.N, c.Length);
     }
-    
+
     [Fact]
-    public void CCAKEM_keygen_Returns_CorrectlySizedPublicKey() {
+    public void CCAKEM_keygen_Returns_CorrectlySizedPublicKey()
+    {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, _) = kyber.CCAKEM_keygen();
 
         Assert.Equal(12 * param.K * param.N + (32 * 8), pk.Length);
     }
-    
+
     [Fact]
-    public void CCAKEM_keygen_Returns_CorrectlySizedSecretKey() {
+    public void CCAKEM_keygen_Returns_CorrectlySizedSecretKey()
+    {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-        var (_ , sk) = kyber.CCAKEM_keygen();
+        var (_, sk) = kyber.CCAKEM_keygen();
 
         Assert.Equal(24 * param.K * param.N + (96 * 8), sk.Length);
     }
-    
+
     [Fact]
     public void CPAPKE_encrypt_decrypt_512()
     {
@@ -43,8 +46,8 @@ public class KyberTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
 
-        var m = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        var coins = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var m = TestHelpers.GetRepeatedChar('0', 256);
+        var coins = TestHelpers.GetRepeatedChar('0', 256);
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
 
@@ -58,8 +61,8 @@ public class KyberTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
 
-        var m = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        var coins = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var m = TestHelpers.GetRepeatedChar('0', 256);
+        var coins = TestHelpers.GetRepeatedChar('0', 256);
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
 
@@ -73,8 +76,8 @@ public class KyberTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
 
-        var m = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        var coins = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var m = TestHelpers.GetRepeatedChar('0', 256);
+        var coins = TestHelpers.GetRepeatedChar('0', 256);
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
 
@@ -88,8 +91,8 @@ public class KyberTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, _) = kyber.CPAPKE_KeyGen();
 
-        var m = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-        var coins = "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var m = TestHelpers.GetRepeatedChar('0', 256);
+        var coins = TestHelpers.GetRepeatedChar('0', 256);
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
 
         Assert.Equal(param.Du * param.K * param.N + param.Dv * param.N, c.Length);

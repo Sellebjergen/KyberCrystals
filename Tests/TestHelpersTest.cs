@@ -54,4 +54,11 @@ public class TestHelpersTest
         var p2 = new List<Polynomial>{new(new List<BigInteger> { 2 })};
         TestHelpers.ComparePolynomialLists(p1, p2);
     }
+    
+    [Fact]
+    public void RepeatedChars_ReturnsCorrectAmount()
+    {
+        var res = TestHelpers.GetRepeatedChar('a', 4);
+        Assert.Equal("aaaa", res);
+    }
 }

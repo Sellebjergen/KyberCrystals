@@ -59,4 +59,12 @@ public static class TestHelpers
 
         return true;
     }
+    
+    public static string GetRepeatedChar(char ch, int amount)
+    {
+        string res = "";
+        for (var i = 0; i < amount; i++)
+            res += ch;
+        return res;
+    }
 }

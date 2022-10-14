@@ -4,7 +4,8 @@ using Xunit;
 
 namespace Tests;
 
-public class PolynomialRingTests {
+public class PolynomialRingTests 
+{
     [Theory,
     InlineData(17, 5),
     InlineData(3329, 256)]
