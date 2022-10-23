@@ -228,7 +228,8 @@ public class Kyber
         var v = _rq.Add(math2, e2);
         var v2 = _rq.Add(v, Utils.Compress(Utils.Decode(1, m), 1));
 
-        var c1 = Utils.Encode(_params.Du, Utils.Compress(u, (short) _params.Du));
+        var comp = Utils.Compress(u, (short) _params.Du);
+        var c1 = Utils.Encode(_params.Du, comp);
         var c2 = Utils.Encode(_params.Dv, Utils.Compress(v2, (short) _params.Dv));
 
         return string.Join("", c1) +  c2;
@@ -241,6 +242,7 @@ public class Kyber
         if (sk.Length != 12 * _params.K * _params.N)
             throw new ArgumentException(
                 $"The secret key need to be of length {12 * _params.K * _params.N} but was of length {sk.Length}");
+        
         if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
             throw new ArgumentException(
                 $"The secret key need to be of length {_params.Du * _params.K * _params.N + _params.Dv * _params.N} but was of length {sk.Length}");

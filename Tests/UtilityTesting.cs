@@ -176,4 +176,26 @@ public class UtilityTesting
         
         Assert.True(xB - x % 3329 < 3329 / (BigInteger) Math.Pow(2, d));
     }
+    
+    [Fact]
+    public void Compress_Returns_ExpectedDownRoundedValue()
+    {
+        // This will make compress return 2^d / 3329 * x = 14.41, BigInteger will round to 14
+        var d = (short) 4;
+        var x = (short) 3000;
+        var y = Utils.Compress(x, d);
+        
+        Assert.Equal(14, y);
+    }
+    
+    [Fact]
+    public void Compress_Returns_ExpectedUproundedValue()
+    {
+        // This will make compress return 2^d / 3329 * x = 14.41, BigInteger will round to 14
+        var d = (short) 4;
+        var x = (short) 3100;
+        var y = Utils.Compress(x, d);
+        
+        Assert.Equal(15, y);
+    }
 }

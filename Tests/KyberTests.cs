@@ -75,6 +75,21 @@ public class KyberTests
 
         Assert.Equal(m, mPrime);
     }
+    
+    [Fact]
+    public void CPAPKE_encrypt_decrypt_512_2()
+    {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, sk) = kyber.CPAPKE_KeyGen();
+
+        var m = TestHelpers.GetRepeatedChar('1', 256);
+        var coins = TestHelpers.GetRepeatedChar('0', 256);
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+        var mPrime = kyber.CPAPKE_decrypt(sk, c);
+
+        Assert.Equal(m, mPrime);
+    }
 
     [Fact]
     public void CPAPKE_encrypt_decrypt_768()

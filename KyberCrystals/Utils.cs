@@ -139,8 +139,7 @@ public static class Utils
         
         for (var i = 0; i < coef.Length; i++)
         {
-            var bit12Length =
-                Convert.ToString((short) coef[i], 2).PadLeft(l, '0');
+            var bit12Length = Convert.ToString((short) coef[i], 2).PadLeft(l, '0');
             
             res += bit12Length;
         }
@@ -200,7 +199,10 @@ public static class Utils
     
     public static BigInteger Compress(short x, short d)
     {
-        return BigInteger.ModPow((BigInteger) Math.Pow(2, d) / 3329 * x, 1, 2); // todo: kyber param
+        // TODO: biginteger will convert to an integer!
+        var res = Math.Pow(2, d) / 3329 * x % Math.Pow(2, d); // todo: kyber param
+        if (res - (int)res < .5) return (BigInteger)res;
+        return BigInteger.ModPow((short)res + 1, 1, (short)Math.Pow(2, d));
     }
     
     public static Polynomial Compress(Polynomial p, short d)
