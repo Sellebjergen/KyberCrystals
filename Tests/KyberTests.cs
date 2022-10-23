@@ -9,6 +9,28 @@ namespace Tests;
 public class KyberTests
 {
     [Fact]
+    public void CCAKEM_encrypt_decrypt_kyber512()
+    {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
+        var (pk, sk) = kyber.CCAKEM_keygen();
+        var (c, kEnc) = kyber.CCAKEM_encrypt(pk);
+        var kDec = kyber.CCAKEM_decrypt(c, sk);
+        
+        Assert.Equal(kEnc, kDec);
+    }
+    
+    [Fact]
+    public void CCAKEM_SecretKey_isLength_AsDescribedInPaper()
+    {
+        var param = new Constants().Kyber512();
+        var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
+        var (_, sk) = kyber.CCAKEM_keygen();
+        
+        Assert.Equal(24 * param.K * param.N + 96 * 8, sk.GetTotalLength());
+    }
+    
+    [Fact]
     public void CCAKEM_encrypt_ReturnsCorrectSizeCipherText()
     {
         var param = new Constants().Kyber512();
@@ -36,7 +58,7 @@ public class KyberTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (_, sk) = kyber.CCAKEM_keygen();
 
-        Assert.Equal(24 * param.K * param.N + (96 * 8), sk.Length);
+        Assert.Equal(24 * param.K * param.N + (96 * 8), sk.GetTotalLength());
     }
 
     [Fact]

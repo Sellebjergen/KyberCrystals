@@ -140,6 +140,24 @@ public class UtilityTesting
     }
     
     [Fact]
+    public void toByte_fromByte_one()
+    {
+        var a = "00000001";
+        var b = Utils.GetBytes(a);
+        
+        Assert.Equal(a, Utils.BytesToString(b));
+    }
+    
+    [Fact]
+    public void toByte_fromByte_max()
+    {
+        var a = "10000000";
+        var b = Utils.GetBytes(a);
+        
+        Assert.Equal(a, Utils.BytesToString(b));
+    }
+    
+    [Fact]
     public void GetBytes_ReturnsCorrect_0ByteWithLength32()
     {
         var a = "00000000";

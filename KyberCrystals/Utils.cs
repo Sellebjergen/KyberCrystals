@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Net;
 using System.Numerics;
 
 namespace KyberCrystals;
@@ -264,6 +263,8 @@ public static class Utils
                 res += "0";
         }
 
-        return res;
+        var arr = res.ToCharArray();
+        Array.Reverse(arr);
+        return new string(arr);
     }
 }

@@ -3,6 +3,8 @@ using System.Numerics;
 
 namespace KyberCrystals;
 
+// TODO: check the input fields in all functions.
+
 public class Kyber
 {
     private readonly Params _params;
@@ -14,18 +16,21 @@ public class Kyber
         _rq = rq; // TODO: Maybe this could be part of the params?
     }
     
-    public (string, string) CCAKEM_keygen()
+    public (string, SecretKey) CCAKEM_keygen()
     {
         var z = Utils.GetRandomBytes(32);
         var (pk, skPrime) = CPAPKE_KeyGen();
-
-        var sk = skPrime + pk + Utils.BytesToString(Utils.H(Utils.GetBytes(pk))) + Utils.BytesToString(z);
+        
+        var sk = new SecretKey(skPrime, pk, Utils.BytesToString(Utils.H(Utils.GetBytes(pk))), Utils.BytesToString(z));
         
         return (pk, sk);
     }
     
     public (string, string) CCAKEM_encrypt(string pk)
     {
+        if (pk.Length != 12 * _params.K * _params.N + 32 * 8)
+            throw new ArgumentException($"Pk should be of length {12 * _params.K * _params.N + 32 * 8} but was of length {pk.Length}");
+
         var m = Utils.GetRandomBytes(32);
         m = Utils.H(m);
         
@@ -48,11 +53,38 @@ public class Kyber
         return (c, Utils.BytesToString(k));
     }
 
-    public string CCAKEM_decrypt(string c, string sk)
+    public string CCAKEM_decrypt(string c, SecretKey sk)
     {
-        // todo: make this.
+        if (sk.GetTotalLength() != 24 * _params.K * _params.N + 96 * 8)
+            throw new ArgumentException(
+                $"The length of the secret key was expected to be {24 * _params.K * _params.N + 96 * 8} " +
+                $"but was found to be {sk.GetTotalLength()}");
+
+        if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
+            throw new ArgumentException($"The length of the ciphertext is expected to be " +
+                                        $"{_params.Du * _params.K * _params.N + _params.Dv * _params.N}" +
+                                        $"but was found to be {c.Length}");
+
+        var (skPrime, pk, h, z) = sk.UnpackSecretKey();
         
-        return "";
+        var mPrime = CPAPKE_decrypt(skPrime, c);
+        var (kPrime, rPrime) = Utils.G(Utils.GetBytes(skPrime + h));
+
+        var cPrime = CPAPKE_encrypt(pk, mPrime, Utils.BytesToString(rPrime));
+        if (c == cPrime)
+        {
+            var hC = Utils.H(Utils.GetBytes(c));
+            
+            var kHc = new byte[kPrime.Length + hC.Length];
+            kPrime.CopyTo(kHc, 0);
+            hC.CopyTo(kHc, kPrime.Length);
+        
+            var k = Utils.Kdf(kHc);
+            return Utils.BytesToString(k);
+        }
+            
+        var randomValue = Utils.Kdf(Utils.GetBytes(z + Utils.H(Utils.GetBytes(c))));
+        return Utils.BytesToString(randomValue);
     }
 
     public (string, string) CPAPKE_KeyGen()
