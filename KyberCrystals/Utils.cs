@@ -200,6 +200,7 @@ public static class Utils
     public static BigInteger Compress(short x, short d)
     {
         // TODO: biginteger will convert to an integer!
+        // TODO: There is a bug if we hit a number directly still!
         var res = Math.Pow(2, d) / 3329 * x % Math.Pow(2, d); // todo: kyber param
         if (res - (int)res < .5) return (BigInteger)res;
         return BigInteger.ModPow((short)res + 1, 1, (short)Math.Pow(2, d));

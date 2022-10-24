@@ -198,4 +198,15 @@ public class UtilityTesting
         
         Assert.Equal(15, y);
     }
+    
+    [Fact]
+    public void Decode_Encode_GivesOriginalResult()
+    {
+        var pol = new Polynomial(new List<BigInteger> { 0, 0, 1 });
+        var x = Utils.Encode(12, pol);
+        var y = Utils.Decode(12, x);
+        y.RemoveTrailingZeros();
+
+        Assert.True(TestHelpers.ComparePolynomials(pol, y));
+    }
 }

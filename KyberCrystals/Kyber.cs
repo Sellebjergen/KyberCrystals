@@ -9,45 +9,46 @@ public class Kyber
 {
     private readonly Params _params;
     private readonly PolynomialRing _rq;
-    
+
     public Kyber(Params p, PolynomialRing rq)
     {
         _params = p;
         _rq = rq; // TODO: Maybe this could be part of the params?
     }
-    
+
     public (string, SecretKey) CCAKEM_keygen()
     {
         var z = Utils.GetRandomBytes(32);
         var (pk, skPrime) = CPAPKE_KeyGen();
-        
+
         var sk = new SecretKey(skPrime, pk, Utils.BytesToString(Utils.H(Utils.GetBytes(pk))), Utils.BytesToString(z));
-        
+
         return (pk, sk);
     }
-    
+
     public (string, string) CCAKEM_encrypt(string pk)
     {
         if (pk.Length != 12 * _params.K * _params.N + 32 * 8)
-            throw new ArgumentException($"Pk should be of length {12 * _params.K * _params.N + 32 * 8} but was of length {pk.Length}");
+            throw new ArgumentException(
+                $"Pk should be of length {12 * _params.K * _params.N + 32 * 8} but was of length {pk.Length}");
 
         var m = Utils.GetRandomBytes(32);
         m = Utils.H(m);
-        
+
         // todo: append concat bytes lists function.
         var hPk = Utils.GetBytes(pk);
         var mHpk = new byte[m.Length + hPk.Length];
         m.CopyTo(mHpk, 0);
         hPk.CopyTo(mHpk, m.Length);
-        
+
         var (kPrime, r) = Utils.G(mHpk);
         var c = CPAPKE_encrypt(pk, Utils.BytesToString(m), Utils.BytesToString(r));
         var hC = Utils.H(Utils.GetBytes(c));
-        
+
         var kHc = new byte[kPrime.Length + hC.Length];
         kPrime.CopyTo(kHc, 0);
         hC.CopyTo(kHc, kPrime.Length);
-        
+
         var k = Utils.Kdf(kHc);
 
         return (c, Utils.BytesToString(k));
@@ -66,7 +67,7 @@ public class Kyber
                                         $"but was found to be {c.Length}");
 
         var (skPrime, pk, h, z) = sk.UnpackSecretKey();
-        
+
         var mPrime = CPAPKE_decrypt(skPrime, c);
         var (kPrime, rPrime) = Utils.G(Utils.GetBytes(skPrime + h));
 
@@ -74,15 +75,15 @@ public class Kyber
         if (c == cPrime)
         {
             var hC = Utils.H(Utils.GetBytes(c));
-            
+
             var kHc = new byte[kPrime.Length + hC.Length];
             kPrime.CopyTo(kHc, 0);
             hC.CopyTo(kHc, kPrime.Length);
-        
+
             var k = Utils.Kdf(kHc);
             return Utils.BytesToString(k);
         }
-            
+
         var randomValue = Utils.Kdf(Utils.GetBytes(z + Utils.H(Utils.GetBytes(c))));
         return Utils.BytesToString(randomValue);
     }
@@ -93,10 +94,10 @@ public class Kyber
         var (rho, sigma) = Utils.G(d);
 
         var n = 0;
-        
+
         // Generate the A matrix
-        var a = GenerateMatrix(rho, _params.K); // should be NttPolynomials
-        
+        var a = GenerateMatrix(rho, _params.K);
+
         // Sample s
         var s = new List<Polynomial>();
         for (var i = 0; i < _params.K; i++)
@@ -120,11 +121,11 @@ public class Kyber
         var sNtt = new List<Polynomial>();
         foreach (var p in s)
             sNtt.Add(new Polynomial(ntt.Ntt(p.GetPaddedCoefficients(256))));
-        
+
         var eNtt = new List<Polynomial>();
         foreach (var p in e)
             eNtt.Add(new Polynomial(ntt.Ntt(p.GetPaddedCoefficients(256))));
-        
+
         // Calculate value of t
         var t = new List<Polynomial>();
         for (var i = 0; i < _params.K; i++)
@@ -133,11 +134,12 @@ public class Kyber
             for (var j = 0; j < _params.K; j++)
             {
                 var tmp = ntt.Multiplication(
-                    a[i, j].GetPaddedCoefficients(256), 
+                    a[i, j].GetPaddedCoefficients(256),
                     sNtt[j].GetPaddedCoefficients(256));
                 var tmp2 = _rq.Add(tmp, eNtt[j]);
                 sum = _rq.Add(tmp2, sum);
             }
+
             t.Add(sum);
         }
 
@@ -150,15 +152,15 @@ public class Kyber
         var rhoStr = "";
         foreach (var v in new BitArray(rho))
         {
-            rhoStr += (bool) v ? '1' : '0';
+            rhoStr += (bool)v ? '1' : '0';
         }
-        
+
         var pk = Utils.EncodePolynomialList(12, t) + rhoStr;
         var sk = Utils.EncodePolynomialList(12, sNtt);
 
         return (pk, sk);
     }
-    
+
     public string CPAPKE_encrypt(string pk, string m, string coins)
     {
         if (pk.Length < 12 * _params.K * _params.N + 32 * 8)
@@ -177,24 +179,27 @@ public class Kyber
         var r = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
-            r[i] = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta1 * 64), _params.Eta1);
+            r[i] = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
+                _params.Eta1);
             n += 1;
         }
 
         var e1 = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
-            e1[i] = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta1 * 64), _params.Eta1);
+            e1[i] = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
+                _params.Eta1);
         }
 
-        var e2 = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta2 * 64), _params.Eta2);
+        var e2 = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta2 * 64),
+            _params.Eta2);
 
         var ntt = new NttPolyHelper();
         var coinsNtt = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
-            coinsNtt[i] = new Polynomial(ntt.Ntt(r[i].GetPaddedCoefficients(256))); 
+            coinsNtt[i] = new Polynomial(ntt.Ntt(r[i].GetPaddedCoefficients(256)));
         // todo: probably this could be optimized with helper functions
-        
+
         // calculate value u
         var uNtt = new List<Polynomial>();
         for (var i = 0; i < _params.K; i++)
@@ -203,13 +208,14 @@ public class Kyber
             for (var j = 0; j < _params.K; j++)
             {
                 var tmp = ntt.Multiplication(
-                    aInv[i, j].GetPaddedCoefficients(256), 
+                    aInv[i, j].GetPaddedCoefficients(256),
                     coinsNtt[j].GetPaddedCoefficients(256));
                 sum = _rq.Add(sum, tmp);
             }
+
             uNtt.Add(sum);
         }
-        
+
         // get u from uNtt.
         var u = new Polynomial[uNtt.Count];
         for (var i = 0; i < uNtt.Count; i++)
@@ -221,35 +227,34 @@ public class Kyber
         }
 
         // calculate the value of v.
-        var vNtt = new Polynomial(new List<BigInteger>{ 0 });
+        var vNtt = new Polynomial(new List<BigInteger> { 0 });
         var math = ntt.Multiplication(tNtt.GetPaddedCoefficients(256), vNtt.GetPaddedCoefficients(256));
         var math1 = ntt.FromMontgomery(math.GetPaddedCoefficients(256));
         var math2 = ntt.ReduceCoefHacks(new Polynomial(math1));
         var v = _rq.Add(math2, e2);
         var v2 = _rq.Add(v, Utils.Compress(Utils.Decode(1, m), 1));
 
-        var comp = Utils.Compress(u, (short) _params.Du);
+        var comp = Utils.Compress(u, (short)_params.Du);
         var c1 = Utils.Encode(_params.Du, comp);
-        var c2 = Utils.Encode(_params.Dv, Utils.Compress(v2, (short) _params.Dv));
+        var c2 = Utils.Encode(_params.Dv, Utils.Compress(v2, (short)_params.Dv));
 
-        return string.Join("", c1) +  c2;
+        return string.Join("", c1) + c2;
     }
-    
+
     public string CPAPKE_decrypt(string sk, string c)
     {
-        var ntt = new NttPolyHelper(); // todo: instantiate in the constructor instead.
-        
         if (sk.Length != 12 * _params.K * _params.N)
             throw new ArgumentException(
                 $"The secret key need to be of length {12 * _params.K * _params.N} but was of length {sk.Length}");
-        
         if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
             throw new ArgumentException(
                 $"The secret key need to be of length {_params.Du * _params.K * _params.N + _params.Dv * _params.N} but was of length {sk.Length}");
         
-        var u = Utils.Decompress(Utils.Decode(_params.Du, c), (short) _params.Du);
+        var ntt = new NttPolyHelper(); // todo: instantiate in the constructor instead.
+
+        var u = Utils.Decompress(Utils.Decode(_params.Du, c), (short)_params.Du);
         var cBytes = c.Substring(0, _params.Du * _params.K * _params.N);
-        var v = Utils.Decompress(Utils.Decode(_params.Dv, cBytes), (short) _params.Dv);
+        var v = Utils.Decompress(Utils.Decode(_params.Dv, cBytes), (short)_params.Dv);
         var s = Utils.Decode(12, sk);
 
         var uNtt = ntt.Ntt(u.GetPaddedCoefficients(256));
@@ -258,21 +263,22 @@ public class Kyber
         var uSPol = new Polynomial(uS);
 
         var m = Utils.Encode(1, Utils.Compress(_rq.Sub(v, uSPol), 1));
-        
+
         return m;
     }
 
-    public Polynomial[,] GenerateMatrix(byte[] rho, int k) // todo: those could be private and use a strat pattern instead.
+    // todo: those could be private and use a strat pattern instead.
+    public Polynomial[,] GenerateMatrix(byte[] rho, int k)
     {
         var a = new Polynomial[k, k];
-        
+
         for (var i = 0; i < k; i++)
         {
             for (var j = 0; j < k; j++)
             {
                 var jByte = BitConverter.GetBytes(j).First();
                 var iByte = BitConverter.GetBytes(i).First();
-                
+
                 a[i, j] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq.N)));
             }
         }
@@ -283,14 +289,14 @@ public class Kyber
     public Polynomial[,] GenerateTransposedMatrix(byte[] rho, int k)
     {
         var a = new Polynomial[k, k];
-        
+
         for (var i = 0; i < k; i++)
         {
             for (var j = 0; j < k; j++)
             {
                 var jByte = BitConverter.GetBytes(j).First();
                 var iByte = BitConverter.GetBytes(i).First();
-                
+
                 a[j, i] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq.N)));
             }
         }
