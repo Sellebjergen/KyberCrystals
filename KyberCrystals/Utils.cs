@@ -169,12 +169,25 @@ public static class Utils
             for (var j = l-1; j >= 0; j--)
             {
                 var bit = bits[i * l + j] == '1' ? 1 : 0;
-                sum += bit * Math.Pow(2, 12-1-j); // todo: could be implemented using shift? 
+                sum += bit * Math.Pow(2, l-1-j); // todo: could be implemented using shift? 
             }
             coef[i] = (BigInteger) sum;
         }
 
         return new Polynomial(new List<BigInteger>(coef));
+    }
+    
+    public static Polynomial[] Decode(int l, string[] bytesArr)
+    {
+        var res = new Polynomial[bytesArr.Length];
+        
+        for (var i = 0; i < bytesArr.Length; i++)
+        {
+            var bytes = bytesArr[i];
+            res[i] = Decode(l, bytes);
+        }
+        
+        return res;
     }
     
     public static string EncodePolynomialList(int l, List<Polynomial> polys)
@@ -199,11 +212,9 @@ public static class Utils
     
     public static BigInteger Compress(short x, short d)
     {
-        // TODO: biginteger will convert to an integer!
-        // TODO: There is a bug if we hit a number directly still!
-        var res = Math.Pow(2, d) / 3329 * x % Math.Pow(2, d); // todo: kyber param
-        if (res - (int)res < .5) return (BigInteger)res;
-        return BigInteger.ModPow((short)res + 1, 1, (short)Math.Pow(2, d));
+        var compMod = Math.Pow(2, d) / 3329; // TODO: kyber params
+        var res = compMod * x % Math.Pow(2, d);
+        return Convert.ToInt16(res);
     }
     
     public static Polynomial Compress(Polynomial p, short d)
@@ -229,7 +240,8 @@ public static class Utils
     
     public static BigInteger Decompress(short x, short d)
     {
-        return (BigInteger) (3329 /Math.Pow(2, d)) * x;
+        var decomConstant = 3329 / Math.Pow(2, d);
+        return Convert.ToInt16(decomConstant * x);
     }
     
     public static Polynomial Decompress(Polynomial p, short d)

@@ -60,6 +60,11 @@ public static class TestHelpers
         return true;
     }
     
+    public static bool ComparePolynomialArrays(Polynomial[] p, Polynomial[] p2)
+    {
+        return ComparePolynomialLists(new List<Polynomial>(p), new List<Polynomial>(p2));
+    }
+    
     public static string GetRepeatedChar(char ch, int amount)
     {
         string res = "";
@@ -67,4 +72,11 @@ public static class TestHelpers
             res += ch;
         return res;
     }
-}
+    
+    public static bool ElementsAreClose(int x, int xPrime, int d, int q)
+    {
+        var diff = x - xPrime;
+        var exponent = q / Math.Pow(2, d + 1);
+        return diff <= Convert.ToInt32(exponent);
+    }
+} 

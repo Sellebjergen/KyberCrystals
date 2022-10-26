@@ -61,4 +61,22 @@ public class TestHelpersTest
         var res = TestHelpers.GetRepeatedChar('a', 4);
         Assert.Equal("aaaa", res);
     }
+    
+    [Fact]
+    public void CloseElements_xEqualxPrime_ReturnsTrue()
+    {
+        Assert.True(TestHelpers.ElementsAreClose(3000, 3000, 10, 3329));
+    }
+    
+    [Fact]
+    public void CloseElements_xPrimeSlightlyLowerThanX_ReturnsTrue()
+    {
+        Assert.True(TestHelpers.ElementsAreClose(3000, 2995, 4, 3329));
+    }
+    
+    [Fact]
+    public void ClosedElements_xPrimesMuchLowerThanX_ReturnsFalse()
+    {
+        Assert.False(TestHelpers.ElementsAreClose(3000, 1, 10, 3329));
+    }
 }

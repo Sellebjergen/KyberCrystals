@@ -137,12 +137,14 @@ public class NttPolyHelper
                 p2NttCoef[4 * i + 0], 
                 p2NttCoef[4 * i + 1], 
                 NttZetas[64 + i]);
+            
             var y = BaseMultiplier(
                 p1NttCoef[4 * i + 2], 
                 p1NttCoef[4 * i + 3], 
                 p2NttCoef[4 * i + 2], 
                 p2NttCoef[4 * i + 3],
                 - NttZetas[64 + i]);
+            
             res[4 * i + 0] = x[0];
             res[4 * i + 1] = x[1];
             res[4 * i + 2] = y[0];
@@ -152,7 +154,7 @@ public class NttPolyHelper
         return new Polynomial(new List<BigInteger>(res));
     }
     
-    public Polynomial ReduceCoefHacks(Polynomial p)
+    public Polynomial ReduceCoefHacks(Polynomial p) // TODO: this should probably be removed.
     {
         var coef = p.GetCoefficients();
         for (var i = 0; i < p.GetLengthOfPolynomial(); i++)

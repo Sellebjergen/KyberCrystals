@@ -5,7 +5,7 @@ namespace KyberCrystals;
 
 public class PolynomialRing
 {
-    public BigInteger Q { get; }
+    private BigInteger Q { get; }
     public BigInteger N { get; }
     private readonly Polynomial _modPoly;
     private readonly IPolyModStrategy _polyModStrategy = new LongPolynomialDivision();

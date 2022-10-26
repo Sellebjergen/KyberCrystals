@@ -43,15 +43,16 @@ public class Kyber
 
         var (kPrime, r) = Utils.G(mHpk);
         var c = CPAPKE_encrypt(pk, Utils.BytesToString(m), Utils.BytesToString(r));
-        var hC = Utils.H(Utils.GetBytes(c));
+        //var hC = Utils.H(Utils.GetBytes(c));
 
-        var kHc = new byte[kPrime.Length + hC.Length];
-        kPrime.CopyTo(kHc, 0);
-        hC.CopyTo(kHc, kPrime.Length);
+        //var kHc = new byte[kPrime.Length + hC.Length];
+        //kPrime.CopyTo(kHc, 0);
+        //hC.CopyTo(kHc, kPrime.Length);
 
-        var k = Utils.Kdf(kHc);
+        //var k = Utils.Kdf(kHc);
 
-        return (c, Utils.BytesToString(k));
+        //return (c, Utils.BytesToString(k));
+        return ("", "");
     }
 
     public string CCAKEM_decrypt(string c, SecretKey sk)
@@ -68,21 +69,21 @@ public class Kyber
 
         var (skPrime, pk, h, z) = sk.UnpackSecretKey();
 
-        var mPrime = CPAPKE_decrypt(skPrime, c);
+        // var mPrime = CPAPKE_decrypt(skPrime, c);
         var (kPrime, rPrime) = Utils.G(Utils.GetBytes(skPrime + h));
 
-        var cPrime = CPAPKE_encrypt(pk, mPrime, Utils.BytesToString(rPrime));
-        if (c == cPrime)
-        {
-            var hC = Utils.H(Utils.GetBytes(c));
-
-            var kHc = new byte[kPrime.Length + hC.Length];
-            kPrime.CopyTo(kHc, 0);
-            hC.CopyTo(kHc, kPrime.Length);
-
-            var k = Utils.Kdf(kHc);
-            return Utils.BytesToString(k);
-        }
+        // var cPrime = CPAPKE_encrypt(pk, mPrime, Utils.BytesToString(rPrime));
+        // if (c == cPrime)
+        // {
+        //     var hC = Utils.H(Utils.GetBytes(c));
+        //
+        //     var kHc = new byte[kPrime.Length + hC.Length];
+        //     kPrime.CopyTo(kHc, 0);
+        //     hC.CopyTo(kHc, kPrime.Length);
+        //
+        //     var k = Utils.Kdf(kHc);
+        //     return Utils.BytesToString(k);
+        // }
 
         var randomValue = Utils.Kdf(Utils.GetBytes(z + Utils.H(Utils.GetBytes(c))));
         return Utils.BytesToString(randomValue);
@@ -161,7 +162,7 @@ public class Kyber
         return (pk, sk);
     }
 
-    public string CPAPKE_encrypt(string pk, string m, string coins)
+    public CpapkeCiphertext CPAPKE_encrypt(string pk, string m, string coins)
     {
         if (pk.Length < 12 * _params.K * _params.N + 32 * 8)
             throw new ArgumentException("Expected longer public key value");
@@ -238,32 +239,36 @@ public class Kyber
         var c1 = Utils.Encode(_params.Du, comp);
         var c2 = Utils.Encode(_params.Dv, Utils.Compress(v2, (short)_params.Dv));
 
-        return string.Join("", c1) + c2;
+        return new CpapkeCiphertext(c1, c2);
     }
 
-    public string CPAPKE_decrypt(string sk, string c)
+    public string CPAPKE_decrypt(string sk, CpapkeCiphertext c)
     {
         if (sk.Length != 12 * _params.K * _params.N)
             throw new ArgumentException(
                 $"The secret key need to be of length {12 * _params.K * _params.N} but was of length {sk.Length}");
-        if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
-            throw new ArgumentException(
-                $"The secret key need to be of length {_params.Du * _params.K * _params.N + _params.Dv * _params.N} but was of length {sk.Length}");
+        // if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
+        //     throw new ArgumentException(
+        //         $"The secret key need to be of length {_params.Du * _params.K * _params.N + _params.Dv * _params.N} but was of length {sk.Length}");
         
         var ntt = new NttPolyHelper(); // todo: instantiate in the constructor instead.
 
-        var u = Utils.Decompress(Utils.Decode(_params.Du, c), (short)_params.Du);
-        var cBytes = c.Substring(0, _params.Du * _params.K * _params.N);
-        var v = Utils.Decompress(Utils.Decode(_params.Dv, cBytes), (short)_params.Dv);
+        var u = Utils.Decompress(Utils.Decode(_params.Du, c.C1), (short)_params.Du);
+        var v = Utils.Decompress(Utils.Decode(_params.Dv, c.C2), (short)_params.Dv);
         var s = Utils.Decode(12, sk);
-
-        var uNtt = ntt.Ntt(u.GetPaddedCoefficients(256));
-        var uNttS = ntt.Multiplication(uNtt, s.GetPaddedCoefficients(256));
+        
+        // var uNtt = ntt.Ntt(u.GetPaddedCoefficients(256));
+        var uNtt = u.Select(p => ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
+        
+        // TODO: make this dynamic!
+        var u0NttS = ntt.Multiplication(uNtt[0], s.GetPaddedCoefficients(256));
+        var u1NttS = ntt.Multiplication(uNtt[1], s.GetPaddedCoefficients(256));
+        var uNttS = _rq.Add(u0NttS, u1NttS);
         var uS = ntt.InvNtt(uNttS.GetPaddedCoefficients(256));
         var uSPol = new Polynomial(uS);
-
+        
         var m = Utils.Encode(1, Utils.Compress(_rq.Sub(v, uSPol), 1));
-
+        
         return m;
     }
 

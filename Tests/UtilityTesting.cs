@@ -200,7 +200,7 @@ public class UtilityTesting
     }
     
     [Fact]
-    public void Decode_Encode_GivesOriginalResult()
+    public void Encode_Decode_GivesOriginalResult()
     {
         var pol = new Polynomial(new List<BigInteger> { 0, 0, 1 });
         var x = Utils.Encode(12, pol);
@@ -208,5 +208,106 @@ public class UtilityTesting
         y.RemoveTrailingZeros();
 
         Assert.True(TestHelpers.ComparePolynomials(pol, y));
+    }
+    
+    [Fact]
+    public void Encode_Decode_GivesOriginalResult_2()
+    {
+        var pol = new Polynomial(new List<BigInteger> { 0, 0, 1 });
+        var x = Utils.Encode(1, pol);
+        var y = Utils.Decode(1, x);
+        y.RemoveTrailingZeros();
+
+        Assert.True(TestHelpers.ComparePolynomials(pol, y));
+    }
+
+    [Fact]
+    public void Encode_Decode_GivesOriginalResult_3()
+    {
+        var pol = new Polynomial(new List<BigInteger> { 0, 0, 1 });
+        var x = Utils.Encode(4, pol);
+        var y = Utils.Decode(4, x);
+        y.RemoveTrailingZeros();
+
+        Assert.True(TestHelpers.ComparePolynomials(pol, y));
+    }
+    
+    [Fact]
+    public void Encode_Decode_GivesOriginalResult_4()
+    {
+        var pol = new Polynomial(new List<BigInteger> { 0, 0, 1 });
+        var x = Utils.Encode(10, pol);
+        var y = Utils.Decode(10, x);
+        y.RemoveTrailingZeros();
+
+        Assert.True(TestHelpers.ComparePolynomials(pol, y));
+    }
+    
+    [Fact]
+    public void Encode_Decode_MultiplePolynomials_ReturnExpected()
+    {
+        var u = new[]
+        {
+            new Polynomial(new List<BigInteger>{ 0, 0, 1}), 
+            new Polynomial(new List<BigInteger>{0, 0, 2})
+        };
+
+        var uCompress = Utils.Compress(u, 10);
+        var uDecompress = Utils.Decompress(uCompress, 10);
+
+        Assert.True(TestHelpers.ComparePolynomialArrays(u, uDecompress));
+    }
+    
+    [Fact]
+    public void Encode_Decode_ForMultiplePolynomials_ReturnOriginal()
+    {
+        var u = new Polynomial[]
+        {
+            new Polynomial(new List<BigInteger>{ 0, 0, 1}), 
+            new Polynomial(new List<BigInteger>{0, 0, 2})
+        };
+        u[0] = new Polynomial(u[0].GetPaddedCoefficients(256)); // just making sure that the length is equal
+        u[1] = new Polynomial(u[0].GetPaddedCoefficients(256)); // for later assertion.
+        
+        var uEncoded = Utils.Encode(10, u);
+        var uDecoded = Utils.Decode(10, uEncoded);
+
+        Assert.True(TestHelpers.ComparePolynomialArrays(u, uDecoded));
+    }
+    
+    [Fact]
+    public void Debugging_Compress_Decompress()
+    {
+        var p = new Polynomial(new List<BigInteger> { 0, 0, 3000 });
+        var pComp = Utils.Compress(p, 10);
+        var pDeco = Utils.Decompress(pComp, 10);
+
+        Assert.True(TestHelpers.ComparePolynomials(p, pDeco));
+    }
+    
+    [Fact]
+    public void Debugging_EncodeDecode_With_CompressDecompress_OnPolynomialArray_CanBeRecreated()
+    {
+        short du = 10;
+        var u = new[]
+        {
+            new Polynomial(new List<BigInteger>{0, 0, 3000}), 
+            new Polynomial(new List<BigInteger>{0, 0, 3000})
+        };
+
+        var uCompressed = Utils.Compress(u, du);
+        var uEncoded = Utils.Encode(du, uCompressed);
+
+        var uDecoded = Utils.Decode(du, uEncoded);
+        var uDecompressed = Utils.Decompress(uDecoded, du);
+        
+        foreach (var (p, p2) in u.Zip(uDecompressed))
+        {
+            for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+            {
+                var isClose = TestHelpers.ElementsAreClose((short) p.GetCoefficient(i), (short) p2.GetCoefficient(i), du, 3329);
+                Assert.True(isClose);
+            }
+        }
     }
 }
