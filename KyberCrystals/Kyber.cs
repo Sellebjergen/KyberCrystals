@@ -20,10 +20,11 @@ public class Kyber
     {
         var z = Utils.GetRandomBytes(32);
         var (pk, skPrime) = CPAPKE_KeyGen();
-
-        var sk = new SecretKey(skPrime, pk, Utils.BytesToString(Utils.H(Utils.GetBytes(pk))), Utils.BytesToString(z));
-
-        return (pk, sk);
+    
+        // var sk = new SecretKey(skPrime, pk, Utils.BytesToString(Utils.H(Utils.GetBytes(pk))), Utils.BytesToString(z));
+    
+        // return (pk, sk);
+        return ("", new SecretKey("", "", "", ""));
     }
 
     public (string, string) CCAKEM_encrypt(string pk)
@@ -42,7 +43,7 @@ public class Kyber
         hPk.CopyTo(mHpk, m.Length);
 
         var (kPrime, r) = Utils.G(mHpk);
-        var c = CPAPKE_encrypt(pk, Utils.BytesToString(m), Utils.BytesToString(r));
+        // var c = CPAPKE_encrypt(pk, Utils.BytesToString(m), Utils.BytesToString(r));
         //var hC = Utils.H(Utils.GetBytes(c));
 
         //var kHc = new byte[kPrime.Length + hC.Length];
@@ -89,9 +90,13 @@ public class Kyber
         return Utils.BytesToString(randomValue);
     }
 
-    public (string, string) CPAPKE_KeyGen()
+    public (CPAPKE_PublicKey, string) CPAPKE_KeyGen()
     {
-        var d = Utils.GetRandomBytes(32);
+        // var d = Utils.GetRandomBytes(32);
+        var d = new byte[] {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        };
+        
         var (rho, sigma) = Utils.G(d);
 
         var n = 0;
@@ -128,74 +133,58 @@ public class Kyber
             eNtt.Add(new Polynomial(ntt.Ntt(p.GetPaddedCoefficients(256))));
 
         // Calculate value of t
-        var t = new List<Polynomial>();
-        for (var i = 0; i < _params.K; i++)
-        {
-            var sum = new Polynomial(new List<BigInteger>());
-            for (var j = 0; j < _params.K; j++)
-            {
-                var tmp = ntt.Multiplication(
-                    a[i, j].GetPaddedCoefficients(256),
-                    sNtt[j].GetPaddedCoefficients(256));
-                var tmp2 = _rq.Add(tmp, eNtt[j]);
-                sum = _rq.Add(tmp2, sum);
-            }
-
-            t.Add(sum);
-        }
-
+        var t = new Polynomial[2]; // TODO: make this dynamic
+        var x = ntt.Multiplication(a[0, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
+        var y = ntt.Multiplication(a[0, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
+        var x1 = ntt.Multiplication(a[1, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
+        var y2 = ntt.Multiplication(a[1, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
+        t[0] = _rq.Add(new Polynomial(ntt.to_montgomery(_rq.Add(x, y))), e[0]);
+        t[1] = _rq.Add(new Polynomial(ntt.to_montgomery(_rq.Add(x1, y2))), e[1]);
+        
         for (var i = 0; i < sNtt.Count; i++)
         {
-            sNtt[i] = _rq.ReduceModuloQ(sNtt[i]);
+            sNtt[i] = _rq.ReduceModuloQ(sNtt[i]); // TODO: could probably a function to reduce all coefs in poly
         }
 
-        // converts rho to string array
-        var rhoStr = "";
-        foreach (var v in new BitArray(rho))
-        {
-            rhoStr += (bool)v ? '1' : '0';
-        }
-
-        var pk = Utils.EncodePolynomialList(12, t) + rhoStr;
+        var pk = new CPAPKE_PublicKey(Utils.Encode(12, t), rho);
         var sk = Utils.EncodePolynomialList(12, sNtt);
 
         return (pk, sk);
     }
 
-    public CpapkeCiphertext CPAPKE_encrypt(string pk, string m, string coins)
+    public CpapkeCiphertext CPAPKE_encrypt(CPAPKE_PublicKey pk, byte[] m, byte[] coins)
     {
-        if (pk.Length < 12 * _params.K * _params.N + 32 * 8)
-            throw new ArgumentException("Expected longer public key value");
-        if (m.Length < 32 * 8)
-            throw new ArgumentException($"Expected a message of length {32 * 8}, got one of length {m.Length}");
-        if (coins.Length < 32 * 8)
-            throw new ArgumentException($"Expected coins of length {32 * 8} got one of length {coins.Length}");
+        // if (pk.Length < 12 * _params.K * _params.N + 32 * 8)
+        //     throw new ArgumentException("Expected longer public key value");
+        if (m.Length < 32)
+            throw new ArgumentException($"Expected a message of length {32}, got one of length {m.Length}");
+        if (coins.Length < 32)
+            throw new ArgumentException($"Expected coins of length {32} got one of length {coins.Length}");
 
+        var ntt = new NttPolyHelper();
         var n = 0;
-        var tBin = pk.Substring(0, pk.Length - 32 * 8); // todo: I work in bits not in bytes here. thus we take times 8
-        var tNtt = Utils.Decode(12, tBin);
-        var rho = pk.Substring(pk.Length - 32 * 8, 32 * 8);
-        var aInv = GenerateTransposedMatrix(Utils.GetBytes(rho), _params.K);
+        var tNtt = Utils.Decode(12, pk.Test);
+        // var aInv = GenerateTransposedMatrix(Utils.GetBytes(rho), _params.K);
+        var aInv = GenerateTransposedMatrix(pk.Rho, _params.K);
 
         var r = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
-            r[i] = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
+            r[i] = _rq.Cbd(Utils.Prf(coins, BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
                 _params.Eta1);
             n += 1;
         }
-
+        
         var e1 = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
-            e1[i] = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
+            e1[i] = _rq.Cbd(Utils.Prf(coins, BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
                 _params.Eta1);
         }
 
-        var e2 = _rq.Cbd(Utils.Prf(Utils.GetBytes(coins), BitConverter.GetBytes(n).First(), _params.Eta2 * 64),
+        var e2 = _rq.Cbd(Utils.Prf(coins, BitConverter.GetBytes(n).First(), _params.Eta2 * 64),
             _params.Eta2);
 
-        var ntt = new NttPolyHelper();
         var coinsNtt = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
             coinsNtt[i] = new Polynomial(ntt.Ntt(r[i].GetPaddedCoefficients(256)));
@@ -229,17 +218,18 @@ public class Kyber
 
         // calculate the value of v.
         var vNtt = new Polynomial(new List<BigInteger> { 0 });
-        var math = ntt.Multiplication(tNtt.GetPaddedCoefficients(256), vNtt.GetPaddedCoefficients(256));
-        var math1 = ntt.FromMontgomery(math.GetPaddedCoefficients(256));
-        var math2 = ntt.ReduceCoefHacks(new Polynomial(math1));
-        var v = _rq.Add(math2, e2);
-        var v2 = _rq.Add(v, Utils.Compress(Utils.Decode(1, m), 1));
+        // var math = ntt.Multiplication(tNtt.GetPaddedCoefficients(256), vNtt.GetPaddedCoefficients(256));
+        // var math1 = ntt.FromMontgomery(math.GetPaddedCoefficients(256));
+        // var math2 = ntt.ReduceCoefHacks(new Polynomial(math1));
+        // var v = _rq.Add(math2, e2);
+        // var v2 = _rq.Add(v, Utils.Compress(Utils.Decode(1, Utils.BytesToString(m)), 1));
 
-        var comp = Utils.Compress(u, (short)_params.Du);
-        var c1 = Utils.Encode(_params.Du, comp);
-        var c2 = Utils.Encode(_params.Dv, Utils.Compress(v2, (short)_params.Dv));
+        // var comp = Utils.Compress(u, (short)_params.Du);
+        // var c1 = Utils.Encode(_params.Du, comp);
+        // var c2 = Utils.Encode(_params.Dv, Utils.Compress(v2, (short)_params.Dv));
 
-        return new CpapkeCiphertext(c1, c2);
+        // return new CpapkeCiphertext(c1, c2);
+        return new CpapkeCiphertext(new string[] {}, "");
     }
 
     public string CPAPKE_decrypt(string sk, CpapkeCiphertext c)

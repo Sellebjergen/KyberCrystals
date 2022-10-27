@@ -6,6 +6,8 @@ namespace KyberCrystals;
 
 public class NttPolyHelper
 {
+    private const short MontR2 = 1353;
+
     public readonly List<BigInteger> NttZetas = new() // calc all of these dynamically.
     { // Uses mont with R = 2^16 which have inverse 169 in mod 3329
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
@@ -93,10 +95,12 @@ public class NttPolyHelper
         var u = a * 62209; // todo 62209 -> param.qInv
         var t = u * 3329; // todo 3329 -> param.q
         t = a - t;
-        t >>= 16; // TODO: this is due to montgomery factor of 2^16
+        t >>= 16; // TODO: is this due to montgomery factor of 2^16?
+        t %= 3329; // TODO: kyber param
 
-        if (t < 0) return t + 3329;
-        
+        if (t < 0) 
+            return t + 3329; //TODO: Kyber param
+
         return t;
     }
 
@@ -152,6 +156,17 @@ public class NttPolyHelper
         }
 
         return new Polynomial(new List<BigInteger>(res));
+    }
+    
+    public List<BigInteger> to_montgomery(Polynomial p)
+    {
+        var coefs = p.GetCoefficients();
+        for (var i = 0; i < coefs.Count; i++)
+        {
+            coefs[i] = ModQMulMont(MontR2, coefs[i]);
+        }
+
+        return coefs;
     }
     
     public Polynomial ReduceCoefHacks(Polynomial p) // TODO: this should probably be removed.

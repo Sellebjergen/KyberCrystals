@@ -94,7 +94,7 @@ public class PolynomialRing
             coefficients.Add(a - b);
         }
 
-        return ReduceModuloQ(new Polynomial(coefficients));
+        return new Polynomial(coefficients);
     }
 
     // Note that l is the amount of 32 bytes we need to reach n.
