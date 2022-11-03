@@ -4,8 +4,6 @@ using Xunit;
 
 namespace Tests;
 
-// TODO: the tests in here expects the results to be in strings containing bits, thus a factor 8 is needed at all times.
-
 public class KyberTests
 {
     [Fact]
@@ -19,137 +17,67 @@ public class KyberTests
         
         Assert.Equal(kEnc, kDec);
     }
-    
+
+    // TODO: Correct all of these tests
     [Fact]
-    public void CCAKEM_SecretKey_isLength_AsDescribedInPaper()
+    public void CPAPKE_encrypt_decrypt_512()
     {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
-        var (_, sk) = kyber.CCAKEM_keygen();
-        
-        Assert.Equal(24 * param.K * param.N + 96 * 8, sk.GetTotalLength());
+        var (pk, sk) = kyber.CPAPKE_KeyGen();
+    
+        var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+        var mPrime = kyber.CPAPKE_decrypt(sk, c);
+    
+        Assert.Equal(Utils.BytesToString(m), mPrime);
     }
     
     [Fact]
-    public void CCAKEM_encrypt_ReturnsCorrectSizeCipherText()
+    public void CPAPKE_encrypt_decrypt_512_2()
     {
         var param = new Constants().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-        var (pk, _) = kyber.CCAKEM_keygen();
-        var (c, _) = kyber.CCAKEM_encrypt(pk);
-
-        Assert.Equal(param.Du * param.K * param.N + param.Dv * param.N, c.Length);
+        var (pk, sk) = kyber.CPAPKE_KeyGen();
+    
+        var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('1', 256));
+        var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+        var mPrime = kyber.CPAPKE_decrypt(sk, c);
+    
+        Assert.Equal(Utils.BytesToString(m), mPrime);
     }
-
+    
     [Fact]
-    public void CCAKEM_keygen_Returns_CorrectlySizedPublicKey()
+    public void CPAPKE_encrypt_decrypt_768()
     {
-        var param = new Constants().Kyber512();
+        var param = new Constants().Kyber768();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-        var (pk, _) = kyber.CCAKEM_keygen();
-
-        Assert.Equal(12 * param.K * param.N + (32 * 8), pk.Length);
+        var (pk, sk) = kyber.CPAPKE_KeyGen();
+    
+        var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+        var mPrime = kyber.CPAPKE_decrypt(sk, c);
+    
+        Assert.Equal(Utils.BytesToString(m), mPrime);
     }
-
+    
     [Fact]
-    public void CCAKEM_keygen_Returns_CorrectlySizedSecretKey()
+    public void CPAPKE_encrypt_decrypt_1024()
     {
-        var param = new Constants().Kyber512();
+        var param = new Constants().Kyber1024();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-        var (_, sk) = kyber.CCAKEM_keygen();
+        var (pk, sk) = kyber.CPAPKE_KeyGen();
 
-        Assert.Equal(24 * param.K * param.N + (96 * 8), sk.GetTotalLength());
+        var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
+        var c = kyber.CPAPKE_encrypt(pk, m, coins);
+        var mPrime = kyber.CPAPKE_decrypt(sk, c);
+    
+        Assert.Equal(Utils.BytesToString(m), mPrime);
     }
-
-    // TODO: Correct all of these tests
-    // [Fact]
-    // public void CPAPKE_encrypt_decrypt_512()
-    // {
-    //     var param = new Constants().Kyber512();
-    //     var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
-    //     var (pk, sk) = kyber.CPAPKE_KeyGen();
-    //
-    //     var m = TestHelpers.GetRepeatedChar('0', 256);
-    //     var coins = TestHelpers.GetRepeatedChar('0', 256);
-    //     var c = kyber.CPAPKE_encrypt(pk, m, coins);
-    //     var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    //
-    //     Assert.Equal(m, mPrime);
-    // }
-    //
-    // [Fact]
-    // public void CPAPKE_encrypt_decrypt_512_2()
-    // {
-    //     var param = new Constants().Kyber512();
-    //     var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-    //     var (pk, sk) = kyber.CPAPKE_KeyGen();
-    //
-    //     var m = TestHelpers.GetRepeatedChar('1', 256);
-    //     var coins = TestHelpers.GetRepeatedChar('0', 256);
-    //     var c = kyber.CPAPKE_encrypt(pk, m, coins);
-    //     var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    //
-    //     Assert.Equal(m, mPrime);
-    // }
-    //
-    // [Fact]
-    // public void CPAPKE_encrypt_decrypt_512_3()
-    // {
-    //     var param = new Constants().Kyber512();
-    //     var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-    //     var (pk, sk) = kyber.CPAPKE_KeyGen();
-    //
-    //     var m = TestHelpers.GetRepeatedChar('1', 250) + TestHelpers.GetRepeatedChar('0', 6);
-    //     var coins = TestHelpers.GetRepeatedChar('0', 256);
-    //     var c = kyber.CPAPKE_encrypt(pk, m, coins);
-    //     var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    //
-    //     Assert.Equal(m, mPrime);
-    // }
-    //
-    // [Fact]
-    // public void CPAPKE_encrypt_decrypt_768()
-    // {
-    //     var param = new Constants().Kyber768();
-    //     var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-    //     var (pk, sk) = kyber.CPAPKE_KeyGen();
-    //
-    //     var m = TestHelpers.GetRepeatedChar('0', 256);
-    //     var coins = TestHelpers.GetRepeatedChar('0', 256);
-    //     var c = kyber.CPAPKE_encrypt(pk, m, coins);
-    //     var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    //
-    //     Assert.Equal(m, mPrime);
-    // }
-    //
-    // [Fact]
-    // public void CPAPKE_encrypt_decrypt_1024()
-    // {
-    //     var param = new Constants().Kyber1024();
-    //     var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-    //     var (pk, sk) = kyber.CPAPKE_KeyGen();
-    //
-    //     var m = TestHelpers.GetRepeatedChar('0', 256);
-    //     var coins = TestHelpers.GetRepeatedChar('0', 256);
-    //     var c = kyber.CPAPKE_encrypt(pk, m, coins);
-    //     var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    //
-    //     Assert.Equal(m, mPrime);
-    // }
-    //
-    // [Fact]
-    // public void CPAPKE_encrypt_returns_CorrectSizeCiphertext()
-    // {
-    //     var param = new Constants().Kyber512();
-    //     var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-    //     var (pk, _) = kyber.CPAPKE_KeyGen();
-    //
-    //     var m = TestHelpers.GetRepeatedChar('0', 256);
-    //     var coins = TestHelpers.GetRepeatedChar('0', 256);
-    //     var c = kyber.CPAPKE_encrypt(pk, m, coins);
-    //
-    //     // Assert.Equal(param.Du * param.K * param.N + param.Dv * param.N, c.Length); // todo: remove this out comment
-    // }
 
     [Fact]
     public void KeyGen_Returns_CorrectLengthSecretKey()
@@ -159,16 +87,6 @@ public class KyberTests
         var (_, sk) = kyber.CPAPKE_KeyGen();
 
         Assert.Equal(12 * param.K * param.N, sk.Length);
-    }
-
-    [Fact]
-    public void KeyGen_Returns_CorrectLengthPublicKey()
-    {
-        var param = new Constants().Kyber512();
-        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
-        var (pk, _) = kyber.CPAPKE_KeyGen();
-
-        // Assert.Equal(12 * param.K * param.N + 32 * 8, pk.GetLength()); // TODO: resolve this!
     }
 
     [Fact]
@@ -190,19 +108,19 @@ public class KyberTests
     [Fact]
     public void TheModPoly_CanBeWrittenAs_ProductOf2DegPolynomials()
     {
-        var rq = new PolynomialRing(3329, 256); // todo: replace with kyber params dynamically.
+        var rq = new PolynomialRing(3329, 256); 
 
-        var rootOfUnity = Utils.GetRootOfUnity(256, 3329); // todo kyber params
+        var rootOfUnity = Utils.GetRootOfUnity(256, 3329); 
         var sum = new Polynomial(new List<BigInteger>
         {
-            BigInteger.ModPow(-rootOfUnity, 2 * Utils.Br7(0) + 1, 3329), // todo: kyber param
+            BigInteger.ModPow(-rootOfUnity, 2 * Utils.Br7(0) + 1, 3329),
             0,
             1
         });
 
         for (var i = 1; i < 128; i++)
         {
-            var zeta = BigInteger.ModPow(rootOfUnity, 2 * Utils.Br7(i) + 1, 3329); // kyber param
+            var zeta = BigInteger.ModPow(rootOfUnity, 2 * Utils.Br7(i) + 1, 3329);
             var p = new Polynomial(new List<BigInteger> { -zeta, 0, 1 });
             sum = rq.Mult(sum, p);
         }
@@ -242,31 +160,14 @@ public class KyberTests
     }
     
     [Fact]
-    public void PleaseRemoveThis()
+    public void Debugging()
     {
         var kyber = new Kyber(new Constants().Kyber512(), new PolynomialRing(3329, 256));
-        var (pk, sk) = kyber.CPAPKE_KeyGen();
-
-        //var m = TestHelpers.GetRepeatedChar('0', 256);
-        var m = Convert.FromHexString("ee9b3e1d0cb31e06f53f388c20f873070785ca17d998157401992329ea658a38");
-        //var coins = TestHelpers.GetRepeatedChar('0', 256);
-        var coins = Convert.FromHexString("5473bce5b8dd34afa95ffd49754a617830a60fa45de2b3dd909e58824cc46f8d");
-
-        var cipher = kyber.CPAPKE_encrypt(pk, m, coins);
-        var mPrime = kyber.CPAPKE_decrypt(sk, cipher);
-        
-        // Assert.Equal(m, mPrime);
-    }
     
-    [Fact]
-    public void Remove()
-    {
-        var kyber = new Kyber(new Constants().Kyber512(), new PolynomialRing(3329, 256));
-        var (pk, sk) = kyber.CPAPKE_KeyGen();
-
-        var m = TestHelpers.GetRepeatedChar('0', 256);
-        var coins = TestHelpers.GetRepeatedChar('0', 256);
-        
-        Assert.True(false);
+        var (pk, sk) = kyber.CCAKEM_keygen();
+        var (c, key) = kyber.CCAKEM_encrypt(pk);
+        var keyPrime = kyber.CCAKEM_decrypt(c, sk);
+    
+        Assert.Equal(key, keyPrime);
     }
 }

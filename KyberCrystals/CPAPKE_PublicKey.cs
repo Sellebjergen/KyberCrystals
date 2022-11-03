@@ -1,3 +1,5 @@
+using System.Collections;
+
 namespace KyberCrystals;
 
 public class CPAPKE_PublicKey
@@ -9,5 +11,10 @@ public class CPAPKE_PublicKey
     {
         Test = test;
         Rho = rho;
+    }
+    
+    public string GetCombinedString()
+    {
+        return String.Join("", Test) + Utils.BytesToString(Rho);
     }
 }

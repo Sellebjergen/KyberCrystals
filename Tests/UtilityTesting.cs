@@ -310,4 +310,13 @@ public class UtilityTesting
             }
         }
     }
+    
+    [Fact]
+    public void GetBytes_ReturnExpectedBytes()
+    {
+        var bitString = "000010111110000010111110";
+        var bytes = Utils.GetBytes(bitString);
+        
+        Assert.Equal(Convert.FromHexString("d0077d"), bytes);
+    }
 }

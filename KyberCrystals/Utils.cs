@@ -139,9 +139,9 @@ public static class Utils
         
         for (var i = 0; i < coef.Length; i++)
         {
-            var bit12Length = Convert.ToString((short) coef[i], 2).PadLeft(l, '0');
-            
-            res += bit12Length;
+            var bitLLength= Convert.ToString((short) coef[i], 2).PadLeft(l, '0').ToCharArray();
+            Array.Reverse(bitLLength);
+            res += new string(bitLLength);
         }
         
         return res;
@@ -158,20 +158,16 @@ public static class Utils
         return res;
     }
 
-    public static Polynomial Decode(int l, string bytes)
+    public static Polynomial Decode(int l, string bits)
     {
-        var bits = bytes;
         var coef = new BigInteger[256];
         
-        for (var i = 0; i < 256; i++)
+        for (var i = 0; i < bits.Length / l; i++)
         {
-            var sum = 0.0;
-            for (var j = l-1; j >= 0; j--)
-            {
-                var bit = bits[i * l + j] == '1' ? 1 : 0;
-                sum += bit * Math.Pow(2, l-1-j); // todo: could be implemented using shift? 
-            }
-            coef[i] = (BigInteger) sum;
+            var tmp = bits.Substring(i * l, l).ToCharArray();
+            Array.Reverse(tmp);
+            var c = Convert.ToInt16(new string(tmp), 2);
+            coef[i] = c;
         }
 
         return new Polynomial(new List<BigInteger>(coef));
@@ -204,16 +200,21 @@ public static class Utils
 
     public static byte[] GetBytes(string bitString)
     {
-        return Enumerable.Range(0, bitString.Length / 8).Select(pos => Convert.ToByte(
-            bitString.Substring(pos * 8, 8),
-            2)
-        ).ToArray();
+        var bytes = new byte[bitString.Length / 8];
+        for (var i = 0; i < bitString.Length / 8; i++)
+        {
+            var byteString = bitString.Substring(i * 8, 8).ToCharArray();
+            Array.Reverse(byteString);
+            bytes[i] = Convert.ToByte(new string(byteString), 2);
+        }
+
+        return bytes;
     }
     
     public static BigInteger Compress(short x, short d)
     {
         var compMod = Math.Pow(2, d) / 3329; // TODO: kyber params
-        var res = compMod * x % Math.Pow(2, d);
+        var res = Convert.ToInt16(compMod * x) % Math.Pow(2, d);
         return Convert.ToInt16(res);
     }
     
@@ -278,8 +279,6 @@ public static class Utils
                 res += "0";
         }
 
-        var arr = res.ToCharArray();
-        Array.Reverse(arr);
-        return new string(arr);
+        return res;
     }
 }

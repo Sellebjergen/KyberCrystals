@@ -3,11 +3,11 @@ namespace KyberCrystals;
 public class SecretKey
 {
     private readonly string _skPrime;
-    private readonly string _pk;
-    private readonly string _h;
-    private readonly string _z;
+    private readonly CPAPKE_PublicKey _pk;
+    private readonly byte[] _h;
+    private readonly byte[] _z;
     
-    public SecretKey(string skPrime, string pk, string h, string z)
+    public SecretKey(string skPrime, CPAPKE_PublicKey pk, byte[] h, byte[] z)
     {
         _skPrime = skPrime;
         _pk = pk;
@@ -15,13 +15,13 @@ public class SecretKey
         _z = z;
     }
     
-    public int GetTotalLength()
-    {
-        return _skPrime.Length + _pk.Length + _h.Length + _z.Length;
-    }
-    
-    public (string, string, string, string) UnpackSecretKey()
+    public (string, CPAPKE_PublicKey , byte[], byte[]) UnpackSecretKey()
     {
         return (_skPrime, _pk, _h, _z);
+    }
+    
+    public string GetCombinedString()
+    {
+        return _skPrime + _pk.GetCombinedString() + Utils.BytesToString(_h) + Utils.BytesToString(_z);;
     }
 }
