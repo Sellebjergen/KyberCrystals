@@ -1,4 +1,6 @@
-﻿namespace KyberCrystals;
+﻿using System.Numerics;
+
+namespace KyberCrystals;
 
 // TODO: check the input fields in all functions. 
 
@@ -36,7 +38,6 @@ public class Kyber
         //         $"Pk should be of length {12 * _params.K * _params.N + 32 * 8} but was of length {pk.Length}");
 
         var m = Utils.GetRandomBytes(32);
-        // var m = Convert.FromHexString("ab7e585a2027b3cdd3ae31282b705f0c4d350155dda5a89b27e6e4f2ab10f871");
         m = Utils.H(m);
 
         // todo: append concat bytes lists function.
@@ -191,17 +192,7 @@ public class Kyber
         var e2 = _rq.Cbd(Utils.Prf(coins, Convert.ToByte(n), _params.Eta2 * 64), _params.Eta2);
 
         // calculate value u
-        var uNtt = new Polynomial[_params.K]; // TODO: All of this can be made dynamic, it won't work for k != 2.
-        var x = _ntt.Multiplication(aInv[0, 0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
-        var y = _ntt.Multiplication(aInv[0, 1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
-        var x1 = _ntt.Multiplication(aInv[1, 0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
-        var y1 = _ntt.Multiplication(aInv[1, 1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
-        var tmpNtt = new Polynomial(_rq.Add(x, y).GetPaddedCoefficients(256));
-        var tmp =new Polynomial(_ntt.InvNtt(tmpNtt.GetPaddedCoefficients(256)));
-        uNtt[0] = _rq.Add(tmp, e1[0]);
-        var tmpNtt2 = new Polynomial(_rq.Add(x1, y1).GetPaddedCoefficients(256));
-        var tmp2 = _ntt.InvNtt(tmpNtt2.GetPaddedCoefficients(256));
-        uNtt[1] = _rq.Add(new Polynomial(tmp2), e1[1]);
+        var uNtt = CalcUMatrix(aInv, rNtt, e1);
         
         // calculate the value of v.
         var q2 = _ntt.Multiplication(tNtt[1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
@@ -239,13 +230,7 @@ public class Kyber
         var u = Utils.Decompress(uTmp, (short)_params.Du);
         var v = Utils.Decompress(Utils.Decode(_params.Dv, c.C2), (short)_params.Dv);
         
-        // TODO: this could be made more dynamic!
-        var s = new Polynomial[2];
-        s[0] = Utils.Decode(12, sk.Substring(0, sk.Length / 2));
-        s[1] = Utils.Decode(12, sk.Substring(sk.Length / 2));
-        
-        
-        // var uNtt = ntt.Ntt(u.GetPaddedCoefficients(256));
+        var s = RetreiveSecretKey(sk);
         var uNtt = u.Select(p => _ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
         
         // TODO: make this dynamic!
@@ -277,6 +262,18 @@ public class Kyber
 
         return a;
     }
+    
+    private Polynomial[] RetreiveSecretKey(string sk) // TODO: this could be refactored to be a secret key object?
+    {
+        var s = new Polynomial[_params.K];
+        var subLength = sk.Length / _params.K;
+        for (var i = 0; i < _params.K; i++)
+        {
+            s[i] = Utils.Decode(12, sk.Substring(i * subLength, subLength));
+        }
+        
+        return s;
+    }
 
     public Polynomial[,] GenerateTransposedMatrix(byte[] rho, int k)
     {
@@ -294,5 +291,24 @@ public class Kyber
         }
 
         return a;
+    }
+    
+    private Polynomial[] CalcUMatrix(Polynomial[,] aInv, Polynomial[] rNtt, Polynomial[] e1)
+    {
+        var uNtt = new Polynomial[_params.K];
+        
+        for (var i = 0; i < _params.K; i++)
+        {
+            var sum = new Polynomial(new List<BigInteger> { 0 });
+            for (var j = 0; j < _params.K; j++)
+            {
+                var x = _ntt.Multiplication(aInv[i, j].GetPaddedCoefficients(256), rNtt[j].GetPaddedCoefficients(256));
+                sum = _rq.Add(sum, x);
+            }
+
+            uNtt[i] = _rq.Add(new Polynomial(_ntt.InvNtt(sum.GetPaddedCoefficients(256))), e1[i]);
+        }
+        
+        return uNtt;
     }
 }
