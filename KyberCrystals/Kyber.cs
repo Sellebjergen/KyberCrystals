@@ -1,30 +1,24 @@
-﻿using System.Collections;
-using System.Net.Mail;
-using System.Numerics;
-using System.Xml.Schema;
-using Org.BouncyCastle.Crypto.Tls;
+﻿namespace KyberCrystals;
 
-namespace KyberCrystals;
-
-// TODO: check the input fields in all functions.
+// TODO: check the input fields in all functions. 
 
 public class Kyber
 {
     private readonly Params _params;
     private readonly PolynomialRing _rq;
+    private readonly NttPolyHelper _ntt;
 
     public Kyber(Params p, PolynomialRing rq)
     {
         _params = p;
         _rq = rq; // TODO: Maybe this could be part of the params?
+        _ntt = new NttPolyHelper();
     }
 
     public (CPAPKE_PublicKey, SecretKey) CCAKEM_keygen()
     {
         var (pk, skPrime) = CPAPKE_KeyGen();
-        // var z = Utils.GetRandomBytes(32);
-        // TODO: fixed for the sake of debugging
-        var z = Convert.FromHexString("6c98b7e1c2e85e1ac10d5594775d7e1dc7cc14eb7a275f0eda548af18af6d27e"); 
+        var z = Utils.GetRandomBytes(32);
     
         var sk = new SecretKey(
             skPrime, 
@@ -105,13 +99,8 @@ public class Kyber
 
     public (CPAPKE_PublicKey, string) CPAPKE_KeyGen()
     {
-        // var d = Utils.GetRandomBytes(32); // TODO: remember to uncomment this!
-        var d = new byte[] {
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-        };
-        
+        var d = Utils.GetRandomBytes(32); // TODO: remember to uncomment this!
         var (rho, sigma) = Utils.G(d);
-
         var n = 0;
 
         // Generate the A matrix
@@ -136,23 +125,22 @@ public class Kyber
         }
 
         // converts to Ntt representation
-        var ntt = new NttPolyHelper();
         var sNtt = new List<Polynomial>();
         foreach (var p in s)
-            sNtt.Add(new Polynomial(ntt.Ntt(p.GetPaddedCoefficients(256))));
+            sNtt.Add(new Polynomial(_ntt.Ntt(p.GetPaddedCoefficients(256))));
 
         var eNtt = new List<Polynomial>();
         foreach (var p in e)
-            eNtt.Add(new Polynomial(ntt.Ntt(p.GetPaddedCoefficients(256))));
+            eNtt.Add(new Polynomial(_ntt.Ntt(p.GetPaddedCoefficients(256))));
 
         // Calculate value of t
         var t = new Polynomial[2]; // TODO: make this dynamic - Generate a function for this, when we have it working.
-        var x = ntt.Multiplication(a[0, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
-        var y = ntt.Multiplication(a[0, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
-        var x1 = ntt.Multiplication(a[1, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
-        var y2 = ntt.Multiplication(a[1, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
-        t[0] = _rq.Add(new Polynomial(ntt.to_montgomery(_rq.Add(x, y))), e[0]);
-        t[1] = _rq.Add(new Polynomial(ntt.to_montgomery(_rq.Add(x1, y2))), e[1]);
+        var x = _ntt.Multiplication(a[0, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
+        var y = _ntt.Multiplication(a[0, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
+        var x1 = _ntt.Multiplication(a[1, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
+        var y2 = _ntt.Multiplication(a[1, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
+        t[0] = _rq.Add(new Polynomial(_ntt.to_montgomery(_rq.Add(x, y))), e[0]);
+        t[1] = _rq.Add(new Polynomial(_ntt.to_montgomery(_rq.Add(x1, y2))), e[1]);
         
         for (var i = 0; i < sNtt.Count; i++)
         {
@@ -174,7 +162,6 @@ public class Kyber
         if (coins.Length < 32)
             throw new ArgumentException($"Expected coins of length {32} got one of length {coins.Length}");
 
-        var ntt = new NttPolyHelper();
         var n = 0;
         var tNtt = Utils.Decode(12, pk.Test);
         var aInv = GenerateTransposedMatrix(pk.Rho, _params.K);
@@ -190,7 +177,7 @@ public class Kyber
         var rNtt = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
-            rNtt[i] = new Polynomial(ntt.Ntt(r[i].GetPaddedCoefficients(256)));
+            rNtt[i] = new Polynomial(_ntt.Ntt(r[i].GetPaddedCoefficients(256)));
         }
 
         var e1 = new Polynomial[_params.K];
@@ -205,22 +192,22 @@ public class Kyber
 
         // calculate value u
         var uNtt = new Polynomial[_params.K]; // TODO: All of this can be made dynamic, it won't work for k != 2.
-        var x = ntt.Multiplication(aInv[0, 0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
-        var y = ntt.Multiplication(aInv[0, 1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
-        var x1 = ntt.Multiplication(aInv[1, 0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
-        var y1 = ntt.Multiplication(aInv[1, 1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
+        var x = _ntt.Multiplication(aInv[0, 0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
+        var y = _ntt.Multiplication(aInv[0, 1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
+        var x1 = _ntt.Multiplication(aInv[1, 0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
+        var y1 = _ntt.Multiplication(aInv[1, 1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
         var tmpNtt = new Polynomial(_rq.Add(x, y).GetPaddedCoefficients(256));
-        var tmp =new Polynomial(ntt.InvNtt(tmpNtt.GetPaddedCoefficients(256)));
+        var tmp =new Polynomial(_ntt.InvNtt(tmpNtt.GetPaddedCoefficients(256)));
         uNtt[0] = _rq.Add(tmp, e1[0]);
         var tmpNtt2 = new Polynomial(_rq.Add(x1, y1).GetPaddedCoefficients(256));
-        var tmp2 = ntt.InvNtt(tmpNtt2.GetPaddedCoefficients(256));
+        var tmp2 = _ntt.InvNtt(tmpNtt2.GetPaddedCoefficients(256));
         uNtt[1] = _rq.Add(new Polynomial(tmp2), e1[1]);
         
         // calculate the value of v.
-        var q2 = ntt.Multiplication(tNtt[1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
-        var q3 = ntt.Multiplication(tNtt[0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
+        var q2 = _ntt.Multiplication(tNtt[1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
+        var q3 = _ntt.Multiplication(tNtt[0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
         var q2Plusq3 = _rq.Add(q2, q3);
-        var v = ntt.InvNtt(q2Plusq3.GetPaddedCoefficients(256));
+        var v = _ntt.InvNtt(q2Plusq3.GetPaddedCoefficients(256));
         var vPoly = new Polynomial(v);
         vPoly = _rq.Add(vPoly, e2);
         vPoly = _rq.Add(vPoly, ConvertMessageToPolynomial(m));
@@ -247,7 +234,6 @@ public class Kyber
         //     throw new ArgumentException(
         //         $"The secret key need to be of length {_params.Du * _params.K * _params.N + _params.Dv * _params.N} but was of length {sk.Length}");
         
-        var ntt = new NttPolyHelper(); // todo: instantiate in the constructor instead.
 
         var uTmp = Utils.Decode(_params.Du, c.C1);
         var u = Utils.Decompress(uTmp, (short)_params.Du);
@@ -260,12 +246,12 @@ public class Kyber
         
         
         // var uNtt = ntt.Ntt(u.GetPaddedCoefficients(256));
-        var uNtt = u.Select(p => ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
+        var uNtt = u.Select(p => _ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
         
         // TODO: make this dynamic!
-        var q = ntt.Multiplication(s[0].GetPaddedCoefficients(256), uNtt[0]);
-        var w = ntt.Multiplication(s[1].GetPaddedCoefficients(256), uNtt[1]);
-        var v1 = ntt.InvNtt(_rq.Add(q, w).GetPaddedCoefficients(256));
+        var q = _ntt.Multiplication(s[0].GetPaddedCoefficients(256), uNtt[0]);
+        var w = _ntt.Multiplication(s[1].GetPaddedCoefficients(256), uNtt[1]);
+        var v1 = _ntt.InvNtt(_rq.Add(q, w).GetPaddedCoefficients(256));
         var v1Poly = new Polynomial(v1);
 
         var m = _rq.Sub(v, v1Poly);
