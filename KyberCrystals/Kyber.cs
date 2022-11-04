@@ -35,8 +35,8 @@ public class Kyber
         //     throw new ArgumentException(
         //         $"Pk should be of length {12 * _params.K * _params.N + 32 * 8} but was of length {pk.Length}");
 
-        // var m = Utils.GetRandomBytes(32);
-        var m = Convert.FromHexString("ab7e585a2027b3cdd3ae31282b705f0c4d350155dda5a89b27e6e4f2ab10f871");
+        var m = Utils.GetRandomBytes(32);
+        // var m = Convert.FromHexString("ab7e585a2027b3cdd3ae31282b705f0c4d350155dda5a89b27e6e4f2ab10f871");
         m = Utils.H(m);
 
         // todo: append concat bytes lists function.
