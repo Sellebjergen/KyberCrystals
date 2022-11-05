@@ -9,7 +9,7 @@ public class KyberTests
     [Fact]
     public void CCAKEM_encrypt_decrypt_kyber512()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
         var (pk, sk) = kyber.CCAKEM_keygen();
         var (c, kEnc) = kyber.CCAKEM_encrypt(pk);
@@ -21,7 +21,7 @@ public class KyberTests
     [Fact]
     public void CPAPKE_encrypt_decrypt_512()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
     
@@ -36,7 +36,7 @@ public class KyberTests
     [Fact]
     public void CPAPKE_encrypt_decrypt_512_2()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
     
@@ -51,7 +51,7 @@ public class KyberTests
     [Fact]
     public void CPAPKE_encrypt_decrypt_768()
     {
-        var param = new Constants().Kyber768();
+        var param = new ParameterGen().Kyber768();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
     
@@ -66,7 +66,7 @@ public class KyberTests
     [Fact]
     public void CPAPKE_encrypt_decrypt_1024()
     {
-        var param = new Constants().Kyber1024();
+        var param = new ParameterGen().Kyber1024();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
 
@@ -81,7 +81,7 @@ public class KyberTests
     [Fact]
     public void KeyGen_Returns_CorrectLengthSecretKey()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (_, sk) = kyber.CPAPKE_KeyGen();
 
@@ -92,7 +92,7 @@ public class KyberTests
     public void MatrixGeneration_DoesNotInclude_nullValues()
     {
         var rq = new PolynomialRing(3329, 256);
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var d = Utils.GetRandomBytes(32);
         var (rho, _) = Utils.G(d);
 
@@ -161,7 +161,7 @@ public class KyberTests
     [Fact]
     public void Debugging()
     {
-        var kyber = new Kyber(new Constants().Kyber512(), new PolynomialRing(3329, 256));
+        var kyber = new Kyber(new ParameterGen().Kyber512(), new PolynomialRing(3329, 256));
     
         var (pk, sk) = kyber.CCAKEM_keygen();
         var (c, key) = kyber.CCAKEM_encrypt(pk);

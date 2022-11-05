@@ -151,7 +151,7 @@ public class PolynomialRingTests
     [Fact]
     public void Test_PolynomialLongDivision()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var degreePol = 1;
         var rq = new PolynomialRing(param.Q, degreePol);
         var p = new Polynomial(new List<BigInteger> {1, 3, 1});     // 1 + 3x + x^2
@@ -165,7 +165,7 @@ public class PolynomialRingTests
     [Fact]
     public void Test2_PolynomialLongDivision()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var degreePol = 1;
         var rq = new PolynomialRing(param.Q, degreePol);
         var p = new Polynomial(new List<BigInteger> {2, 3, 1});     // 2 + 3x + x^2

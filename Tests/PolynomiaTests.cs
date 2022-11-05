@@ -11,7 +11,7 @@ public class PolynomiaTests
     [Fact]
     public void RunningCbd_TwiceOnSameInput_GivesSameOutput()
     {
-        var p = new Constants().Kyber512();
+        var p = new ParameterGen().Kyber512();
         var bytes = TestHelpers.GetRandomBytes(64 * p.Eta1);
 
         var rq = new PolynomialRing(p.Q, p.N);
@@ -25,7 +25,7 @@ public class PolynomiaTests
     public void RunningDecode_TwiceOnSameInput_GivesSameOutput()
     {
         var l = 8;
-        var p = new Constants().Kyber512();
+        var p = new ParameterGen().Kyber512();
         var bytes = TestHelpers.GetRandomBytes(32 * l);
 
         var rq = new PolynomialRing(p.Q, p.N);
@@ -46,7 +46,7 @@ public class PolynomiaTests
     [Fact]
     public void Modulo_Runs_AfterAddOperation()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> { param.Q - 1, param.Q - 1, param.Q - 1 });
         var poly2 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
@@ -60,7 +60,7 @@ public class PolynomiaTests
     [Fact]
     public void Multiplication_OverRq_Works()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         
         var poly1 = new Polynomial(new List<BigInteger> { 1, 1, 1});
@@ -74,7 +74,7 @@ public class PolynomiaTests
     [Fact]
     public void Modulo_Runs_AfterMultOperation()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> { param.Q - 1, param.Q - 1, param.Q - 1 });
         var poly2 = new Polynomial(new List<BigInteger> { 2, 2, 2 });
@@ -112,7 +112,7 @@ public class PolynomiaTests
     [Fact]
     public void Sub_0PolyWith0Poly_Gives0Poly()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> {0, 0, 0 });
         var poly2 = new Polynomial(new List<BigInteger> { 0, 0,0 });
@@ -125,7 +125,7 @@ public class PolynomiaTests
     [Fact]
     public void Sub_1PolyWith1Poly_Gives0Poly()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> {1,1,1,});
         var poly2 = new Polynomial(new List<BigInteger> { 1,1,1 });
@@ -138,7 +138,7 @@ public class PolynomiaTests
     [Fact]
     public void Sub_0PolyWith1Poly_GivesParamQPoly()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> {0,0,0,});
         var poly2 = new Polynomial(new List<BigInteger> { 1,1,1 });
@@ -152,7 +152,7 @@ public class PolynomiaTests
     [Fact]
     public void ConstMult_0PolyWith0Poly_Gives0Poly()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> {0,0,0,});
 
@@ -165,7 +165,7 @@ public class PolynomiaTests
     [Fact]
     public void ConstMult_1PolyWithOtherPoly_GivesOtherPoly()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> {1,1,1,});
 
@@ -178,7 +178,7 @@ public class PolynomiaTests
     [Fact]
     public void ConstMult_WhichOverflows_ReturnsCorrect()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         var poly1 = new Polynomial(new List<BigInteger> {param.Q - 1, param.Q - 1, param.Q - 1});
 
@@ -191,7 +191,7 @@ public class PolynomiaTests
     [Fact]
     public void Sub_RemovesZeroes_IfPresent()
     {
-        var param = new Constants().Kyber512();
+        var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
         
         var poly1 = new Polynomial(new List<BigInteger> {1, 2, param.Q - 1});
