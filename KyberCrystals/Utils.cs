@@ -186,11 +186,11 @@ public static class Utils
         return res;
     }
     
-    public static string EncodePolynomialList(int l, List<Polynomial> polys)
+    public static string EncodePolynomialList(int l, Polynomial[] polys)
     {
-        var res = new string[polys.Count];
+        var res = new string[polys.Length];
         
-        for (var i = 0; i < polys.Count; i++)
+        for (var i = 0; i < polys.Length; i++)
         {
             res[i] = Encode(l, polys[i]);
         }

@@ -13,7 +13,7 @@ public class Kyber
     public Kyber(Params p, PolynomialRing rq)
     {
         _params = p;
-        _rq = rq; // TODO: Maybe this could be part of the params?
+        _rq = rq;
         _ntt = new NttPolyHelper();
     }
 
@@ -108,48 +108,36 @@ public class Kyber
         var a = GenerateMatrix(rho, _params.K);
 
         // Sample s
-        var s = new List<Polynomial>();
+        var s = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
             var inputBytes = Utils.Prf(sigma, BitConverter.GetBytes(n).First(), 64 * _params.Eta1);
-            s.Add(_rq.Cbd(inputBytes, _params.Eta1));
+            s[i] = _rq.Cbd(inputBytes, _params.Eta1);
             n += 1;
         }
 
         // Sample e
-        var e = new List<Polynomial>();
+        var e = new Polynomial[_params.K];
         for (var i = 0; i < _params.K; i++)
         {
             var inputBytes = Utils.Prf(sigma, BitConverter.GetBytes(n).First(), 64 * _params.Eta1);
-            e.Add(_rq.Cbd(inputBytes, _params.Eta1));
+            e[i] = _rq.Cbd(inputBytes, _params.Eta1);
             n += 1;
         }
 
-        // converts to Ntt representation
-        var sNtt = new List<Polynomial>();
-        foreach (var p in s)
-            sNtt.Add(new Polynomial(_ntt.Ntt(p.GetPaddedCoefficients(256))));
-
-        var eNtt = new List<Polynomial>();
+        foreach (var p in s) // TODO: this could return an NttPolynomial to make it explicit that it is not an algebraic polynomial.
+            _ntt.Ntt(p.GetPaddedCoefficients(256));
         foreach (var p in e)
-            eNtt.Add(new Polynomial(_ntt.Ntt(p.GetPaddedCoefficients(256))));
+            _ntt.Ntt(p.GetPaddedCoefficients(256));
 
         // Calculate value of t
-        var t = new Polynomial[2]; // TODO: make this dynamic - Generate a function for this, when we have it working.
-        var x = _ntt.Multiplication(a[0, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
-        var y = _ntt.Multiplication(a[0, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
-        var x1 = _ntt.Multiplication(a[1, 0].GetPaddedCoefficients(256), s[0].GetPaddedCoefficients(256));
-        var y2 = _ntt.Multiplication(a[1, 1].GetPaddedCoefficients(256), s[1].GetPaddedCoefficients(256));
-        t[0] = _rq.Add(new Polynomial(_ntt.to_montgomery(_rq.Add(x, y))), e[0]);
-        t[1] = _rq.Add(new Polynomial(_ntt.to_montgomery(_rq.Add(x1, y2))), e[1]);
+        var t = CalcTMatrix(a, s, e);
         
-        for (var i = 0; i < sNtt.Count; i++)
-        {
-            sNtt[i] = _rq.ReduceModuloQ(sNtt[i]); // TODO: could probably a function to reduce all coefs in poly
-        }
+        for (var i = 0; i < s.Length; i++)
+            s[i] = _rq.ReduceModuloQ(s[i]);
 
         var pk = new CPAPKE_PublicKey(Utils.Encode(12, t), rho);
-        var sk = Utils.EncodePolynomialList(12, sNtt);
+        var sk = Utils.EncodePolynomialList(12, s);
 
         return (pk, sk);
     }
@@ -195,10 +183,16 @@ public class Kyber
         var uNtt = CalcUMatrix(aInv, rNtt, e1);
         
         // calculate the value of v.
-        var q2 = _ntt.Multiplication(tNtt[1].GetPaddedCoefficients(256), rNtt[1].GetPaddedCoefficients(256));
-        var q3 = _ntt.Multiplication(tNtt[0].GetPaddedCoefficients(256), rNtt[0].GetPaddedCoefficients(256));
-        var q2Plusq3 = _rq.Add(q2, q3);
-        var v = _ntt.InvNtt(q2Plusq3.GetPaddedCoefficients(256));
+        var sum = new Polynomial(new List<BigInteger> { 0 });
+        for (var i = 0; i < _params.K; i++)
+        {
+            var tmp = _ntt.Multiplication(
+                tNtt[i].GetPaddedCoefficients(256), 
+                rNtt[i].GetPaddedCoefficients(256));
+            sum = _rq.Add(sum, tmp);
+        }
+        var v = _ntt.InvNtt(sum.GetPaddedCoefficients(256));
+        
         var vPoly = new Polynomial(v);
         vPoly = _rq.Add(vPoly, e2);
         vPoly = _rq.Add(vPoly, ConvertMessageToPolynomial(m));
@@ -233,13 +227,14 @@ public class Kyber
         var s = RetreiveSecretKey(sk);
         var uNtt = u.Select(p => _ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
         
-        // TODO: make this dynamic!
-        var q = _ntt.Multiplication(s[0].GetPaddedCoefficients(256), uNtt[0]);
-        var w = _ntt.Multiplication(s[1].GetPaddedCoefficients(256), uNtt[1]);
-        var v1 = _ntt.InvNtt(_rq.Add(q, w).GetPaddedCoefficients(256));
-        var v1Poly = new Polynomial(v1);
-
-        var m = _rq.Sub(v, v1Poly);
+        var sum = new Polynomial(new List<BigInteger> { 0 });
+        for (var i = 0; i < _params.K; i++)
+        {
+            var tmp = _ntt.Multiplication(s[i].GetPaddedCoefficients(256), uNtt[i]);
+            sum = _rq.Add(sum, tmp);
+        }
+        var vPoly = new Polynomial(_ntt.InvNtt(sum.GetPaddedCoefficients(256)));
+        var m = _rq.Sub(v, vPoly);
 
         return Utils.Encode(1, Utils.Compress(m, 1));
     }
@@ -302,7 +297,9 @@ public class Kyber
             var sum = new Polynomial(new List<BigInteger> { 0 });
             for (var j = 0; j < _params.K; j++)
             {
-                var x = _ntt.Multiplication(aInv[i, j].GetPaddedCoefficients(256), rNtt[j].GetPaddedCoefficients(256));
+                var x = _ntt.Multiplication(
+                    aInv[i, j].GetPaddedCoefficients(256), 
+                    rNtt[j].GetPaddedCoefficients(256));
                 sum = _rq.Add(sum, x);
             }
 
@@ -310,5 +307,26 @@ public class Kyber
         }
         
         return uNtt;
+    }
+    
+    private Polynomial[] CalcTMatrix(Polynomial[,] a, Polynomial[] s, Polynomial[] e)
+    {
+        var t = new Polynomial[_params.K];
+
+        for (var i = 0; i < _params.K; i++)
+        {
+            var sum = new Polynomial(new List<BigInteger> { 0 });
+            for (var j = 0; j < _params.K; j++)
+            {
+                var x = _ntt.Multiplication(
+                    a[i, j].GetPaddedCoefficients(256), 
+                    s[j].GetPaddedCoefficients(256));
+                sum = _rq.Add(sum, x);
+            }
+
+            t[i] = _rq.Add(new Polynomial(_ntt.to_montgomery(sum)), e[i]);
+        }
+        
+        return t;
     }
 }
