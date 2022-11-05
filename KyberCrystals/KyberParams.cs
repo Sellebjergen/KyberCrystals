@@ -1,6 +1,6 @@
 namespace KyberCrystals;
 
-public class Params
+public class KyberParams
 {
     public int N { get; set; }
     public int K { get; set; }

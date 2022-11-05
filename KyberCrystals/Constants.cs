@@ -3,9 +3,9 @@ namespace KyberCrystals;
 public class Constants
 {
     // Defined in the Kyber specification paper.
-    public Params Kyber512()
+    public KyberParams Kyber512()
     {
-        return new Params
+        return new KyberParams
         {
             N = 256,
             K = 2,
@@ -17,9 +17,9 @@ public class Constants
         };
     }
 
-    public Params Kyber768()
+    public KyberParams Kyber768()
     {
-        return new Params
+        return new KyberParams
         {
             N = 256,
             K = 3,
@@ -31,9 +31,9 @@ public class Constants
         };
     }
     
-    public Params Kyber1024()
+    public KyberParams Kyber1024()
     {
-        return new Params
+        return new KyberParams
         {
             N = 256,
             K = 4,

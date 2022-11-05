@@ -6,13 +6,13 @@ namespace KyberCrystals;
 
 public class Kyber
 {
-    private readonly Params _params;
+    private readonly KyberParams _kyberParams;
     private readonly PolynomialRing _rq;
     private readonly NttPolyHelper _ntt;
 
-    public Kyber(Params p, PolynomialRing rq)
+    public Kyber(KyberParams p, PolynomialRing rq)
     {
-        _params = p;
+        _kyberParams = p;
         _rq = rq;
         _ntt = new NttPolyHelper();
     }
@@ -33,9 +33,9 @@ public class Kyber
 
     public (CPAPKE_Ciphertext, string) CCAKEM_encrypt(CPAPKE_PublicKey pk)
     {
-        // if (pk.Length != 12 * _params.K * _params.N + 32 * 8)
+        // if (pk.Length != 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
         //     throw new ArgumentException(
-        //         $"Pk should be of length {12 * _params.K * _params.N + 32 * 8} but was of length {pk.Length}");
+        //         $"Pk should be of length {12 * _kyberParams.K * _kyberParams.N + 32 * 8} but was of length {pk.Length}");
 
         var m = Utils.GetRandomBytes(32);
         m = Utils.H(m);
@@ -61,14 +61,14 @@ public class Kyber
 
     public string CCAKEM_decrypt(CPAPKE_Ciphertext c, SecretKey sk)
     {
-        // if (sk.GetTotalLength() != 24 * _params.K * _params.N + 96 * 8)
+        // if (sk.GetTotalLength() != 24 * _kyberParams.K * _kyberParams.N + 96 * 8)
         //     throw new ArgumentException(
-        //         $"The length of the secret key was expected to be {24 * _params.K * _params.N + 96 * 8} " +
+        //         $"The length of the secret key was expected to be {24 * _kyberParams.K * _kyberParams.N + 96 * 8} " +
         //         $"but was found to be {sk.GetTotalLength()}");
 
-        // if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
+        // if (c.Length != _kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N)
         //     throw new ArgumentException($"The length of the ciphertext is expected to be " +
-        //                                 $"{_params.Du * _params.K * _params.N + _params.Dv * _params.N}" +
+        //                                 $"{_kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N}" +
         //                                 $"but was found to be {c.Length}");
 
         var (skPrime, pk, h, z) = sk.UnpackSecretKey();
@@ -105,23 +105,23 @@ public class Kyber
         var n = 0;
 
         // Generate the A matrix
-        var a = GenerateMatrix(rho, _params.K);
+        var a = GenerateMatrix(rho, _kyberParams.K);
 
         // Sample s
-        var s = new Polynomial[_params.K];
-        for (var i = 0; i < _params.K; i++)
+        var s = new Polynomial[_kyberParams.K];
+        for (var i = 0; i < _kyberParams.K; i++)
         {
-            var inputBytes = Utils.Prf(sigma, BitConverter.GetBytes(n).First(), 64 * _params.Eta1);
-            s[i] = _rq.Cbd(inputBytes, _params.Eta1);
+            var inputBytes = Utils.Prf(sigma, BitConverter.GetBytes(n).First(), 64 * _kyberParams.Eta1);
+            s[i] = _rq.Cbd(inputBytes, _kyberParams.Eta1);
             n += 1;
         }
 
         // Sample e
-        var e = new Polynomial[_params.K];
-        for (var i = 0; i < _params.K; i++)
+        var e = new Polynomial[_kyberParams.K];
+        for (var i = 0; i < _kyberParams.K; i++)
         {
-            var inputBytes = Utils.Prf(sigma, BitConverter.GetBytes(n).First(), 64 * _params.Eta1);
-            e[i] = _rq.Cbd(inputBytes, _params.Eta1);
+            var inputBytes = Utils.Prf(sigma, BitConverter.GetBytes(n).First(), 64 * _kyberParams.Eta1);
+            e[i] = _rq.Cbd(inputBytes, _kyberParams.Eta1);
             n += 1;
         }
 
@@ -144,7 +144,7 @@ public class Kyber
 
     public CPAPKE_Ciphertext CPAPKE_encrypt(CPAPKE_PublicKey pk, byte[] m, byte[] coins)
     {
-        // if (pk.Length < 12 * _params.K * _params.N + 32 * 8)
+        // if (pk.Length < 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
         //     throw new ArgumentException("Expected longer public key value");
         if (m.Length < 32)
             throw new ArgumentException($"Expected a message of length {32}, got one of length {m.Length}");
@@ -153,38 +153,38 @@ public class Kyber
 
         var n = 0;
         var tNtt = Utils.Decode(12, pk.Test);
-        var aInv = GenerateTransposedMatrix(pk.Rho, _params.K);
+        var aInv = GenerateTransposedMatrix(pk.Rho, _kyberParams.K);
 
-        var r = new Polynomial[_params.K];
-        for (var i = 0; i < _params.K; i++)
+        var r = new Polynomial[_kyberParams.K];
+        for (var i = 0; i < _kyberParams.K; i++)
         {
-            r[i] = _rq.Cbd(Utils.Prf(coins, BitConverter.GetBytes(n).First(), _params.Eta1 * 64),
-                _params.Eta1);
+            r[i] = _rq.Cbd(Utils.Prf(coins, BitConverter.GetBytes(n).First(), _kyberParams.Eta1 * 64),
+                _kyberParams.Eta1);
             n += 1;
         }
 
-        var rNtt = new Polynomial[_params.K];
-        for (var i = 0; i < _params.K; i++)
+        var rNtt = new Polynomial[_kyberParams.K];
+        for (var i = 0; i < _kyberParams.K; i++)
         {
             rNtt[i] = new Polynomial(_ntt.Ntt(r[i].GetPaddedCoefficients(256)));
         }
 
-        var e1 = new Polynomial[_params.K];
-        for (var i = 0; i < _params.K; i++)
+        var e1 = new Polynomial[_kyberParams.K];
+        for (var i = 0; i < _kyberParams.K; i++)
         {
-            var tmpPrf = Utils.Prf(coins, Convert.ToByte(n), _params.Eta2 * 64);
-            e1[i] = _rq.Cbd(tmpPrf, _params.Eta2);
+            var tmpPrf = Utils.Prf(coins, Convert.ToByte(n), _kyberParams.Eta2 * 64);
+            e1[i] = _rq.Cbd(tmpPrf, _kyberParams.Eta2);
             n += 1;
         }
         
-        var e2 = _rq.Cbd(Utils.Prf(coins, Convert.ToByte(n), _params.Eta2 * 64), _params.Eta2);
+        var e2 = _rq.Cbd(Utils.Prf(coins, Convert.ToByte(n), _kyberParams.Eta2 * 64), _kyberParams.Eta2);
 
         // calculate value u
         var uNtt = CalcUMatrix(aInv, rNtt, e1);
         
         // calculate the value of v.
         var sum = new Polynomial(new List<BigInteger> { 0 });
-        for (var i = 0; i < _params.K; i++)
+        for (var i = 0; i < _kyberParams.K; i++)
         {
             var tmp = _ntt.Multiplication(
                 tNtt[i].GetPaddedCoefficients(256), 
@@ -197,9 +197,9 @@ public class Kyber
         vPoly = _rq.Add(vPoly, e2);
         vPoly = _rq.Add(vPoly, ConvertMessageToPolynomial(m));
         
-        var c1 = Utils.Encode(_params.Du, Utils.Compress(uNtt, (short)_params.Du));
-        var tmpC2 = Utils.Compress(vPoly, (short)_params.Dv);
-        var c2 = Utils.Encode(_params.Dv, tmpC2);
+        var c1 = Utils.Encode(_kyberParams.Du, Utils.Compress(uNtt, (short)_kyberParams.Du));
+        var tmpC2 = Utils.Compress(vPoly, (short)_kyberParams.Dv);
+        var c2 = Utils.Encode(_kyberParams.Dv, tmpC2);
         
         return new CPAPKE_Ciphertext(c1, c2);
     }
@@ -207,28 +207,28 @@ public class Kyber
     private Polynomial ConvertMessageToPolynomial(byte[] m)
     {
         var binPoly = Utils.Decode(1, Utils.BytesToString(m));
-        return _rq.ConstMult(binPoly, Convert.ToInt16(_params.Q / 2) + 1);
+        return _rq.ConstMult(binPoly, Convert.ToInt16(_kyberParams.Q / 2) + 1);
     }
 
     public string CPAPKE_decrypt(string sk, CPAPKE_Ciphertext c)
     {
-        if (sk.Length != 12 * _params.K * _params.N)
+        if (sk.Length != 12 * _kyberParams.K * _kyberParams.N)
             throw new ArgumentException(
-                $"The secret key need to be of length {12 * _params.K * _params.N} but was of length {sk.Length}");
-        // if (c.Length != _params.Du * _params.K * _params.N + _params.Dv * _params.N)
+                $"The secret key need to be of length {12 * _kyberParams.K * _kyberParams.N} but was of length {sk.Length}");
+        // if (c.Length != _kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N)
         //     throw new ArgumentException(
-        //         $"The secret key need to be of length {_params.Du * _params.K * _params.N + _params.Dv * _params.N} but was of length {sk.Length}");
+        //         $"The secret key need to be of length {_kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N} but was of length {sk.Length}");
         
 
-        var uTmp = Utils.Decode(_params.Du, c.C1);
-        var u = Utils.Decompress(uTmp, (short)_params.Du);
-        var v = Utils.Decompress(Utils.Decode(_params.Dv, c.C2), (short)_params.Dv);
+        var uTmp = Utils.Decode(_kyberParams.Du, c.C1);
+        var u = Utils.Decompress(uTmp, (short)_kyberParams.Du);
+        var v = Utils.Decompress(Utils.Decode(_kyberParams.Dv, c.C2), (short)_kyberParams.Dv);
         
         var s = RetreiveSecretKey(sk);
         var uNtt = u.Select(p => _ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
         
         var sum = new Polynomial(new List<BigInteger> { 0 });
-        for (var i = 0; i < _params.K; i++)
+        for (var i = 0; i < _kyberParams.K; i++)
         {
             var tmp = _ntt.Multiplication(s[i].GetPaddedCoefficients(256), uNtt[i]);
             sum = _rq.Add(sum, tmp);
@@ -260,9 +260,9 @@ public class Kyber
     
     private Polynomial[] RetreiveSecretKey(string sk) // TODO: this could be refactored to be a secret key object?
     {
-        var s = new Polynomial[_params.K];
-        var subLength = sk.Length / _params.K;
-        for (var i = 0; i < _params.K; i++)
+        var s = new Polynomial[_kyberParams.K];
+        var subLength = sk.Length / _kyberParams.K;
+        for (var i = 0; i < _kyberParams.K; i++)
         {
             s[i] = Utils.Decode(12, sk.Substring(i * subLength, subLength));
         }
@@ -290,12 +290,12 @@ public class Kyber
     
     private Polynomial[] CalcUMatrix(Polynomial[,] aInv, Polynomial[] rNtt, Polynomial[] e1)
     {
-        var uNtt = new Polynomial[_params.K];
+        var uNtt = new Polynomial[_kyberParams.K];
         
-        for (var i = 0; i < _params.K; i++)
+        for (var i = 0; i < _kyberParams.K; i++)
         {
             var sum = new Polynomial(new List<BigInteger> { 0 });
-            for (var j = 0; j < _params.K; j++)
+            for (var j = 0; j < _kyberParams.K; j++)
             {
                 var x = _ntt.Multiplication(
                     aInv[i, j].GetPaddedCoefficients(256), 
@@ -311,12 +311,12 @@ public class Kyber
     
     private Polynomial[] CalcTMatrix(Polynomial[,] a, Polynomial[] s, Polynomial[] e)
     {
-        var t = new Polynomial[_params.K];
+        var t = new Polynomial[_kyberParams.K];
 
-        for (var i = 0; i < _params.K; i++)
+        for (var i = 0; i < _kyberParams.K; i++)
         {
             var sum = new Polynomial(new List<BigInteger> { 0 });
-            for (var j = 0; j < _params.K; j++)
+            for (var j = 0; j < _kyberParams.K; j++)
             {
                 var x = _ntt.Multiplication(
                     a[i, j].GetPaddedCoefficients(256), 

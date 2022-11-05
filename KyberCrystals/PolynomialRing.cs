@@ -43,7 +43,6 @@ public class PolynomialRing
             }
 
             if (d2 < Q && j < N)
-                // todo: is the else above right? Without we can have polynomials of deg 256 not in rq.
             {
                 coefficients[j] = d2;
                 j += 1;
