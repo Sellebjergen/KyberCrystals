@@ -13,11 +13,11 @@ public class LongPolynomialDivision : IPolyModStrategy
     {
         var r = new Polynomial(p.GetCoefficients());
 
-        while (!r.IsZeroPolynomial() && r.GetLengthOfPolynomial() >= mod.GetLengthOfPolynomial())
+        while (!r.IsZeroPolynomial() && r.GetCoefficients().Count >= mod.GetCoefficients().Count)
         {
-            var t = r.GetCoefficient(r.GetLengthOfPolynomial() - 1) / mod.GetCoefficient(mod.GetLengthOfPolynomial() - 1);
+            var t = r.GetCoefficient(r.GetCoefficients().Count - 1) / mod.GetCoefficient(mod.GetCoefficients().Count - 1);
             var modMulT = rq.ConstMult(mod, t);
-            var shift = ShiftPolynomial(modMulT, r.GetLengthOfPolynomial() - mod.GetLengthOfPolynomial());
+            var shift = ShiftPolynomial(modMulT, r.GetCoefficients().Count - mod.GetCoefficients().Count);
             r = rq.Sub(r, shift);
         }
 

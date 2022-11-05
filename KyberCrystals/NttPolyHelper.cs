@@ -172,7 +172,7 @@ public class NttPolyHelper
     public Polynomial ReduceCoefHacks(Polynomial p) // TODO: this should probably be removed.
     {
         var coef = p.GetCoefficients();
-        for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+        for (var i = 0; i < p.GetCoefficients().Count; i++)
         {
             coef[i] = BigInteger.ModPow(coef[i] * (BigInteger) Math.Pow(2, 16), 1, 3329);  // todo: kyber params
         }

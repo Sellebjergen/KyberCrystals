@@ -91,7 +91,7 @@ public class PolynomiaTests
         var p = new Polynomial(new List<BigInteger> { 1, 0, 0, 0});
         p.RemoveTrailingZeros();
         
-        Assert.Equal(1, p.GetLengthOfPolynomial());
+        Assert.Equal(1, p.GetCoefficients().Count);
     }
 
     [Fact]

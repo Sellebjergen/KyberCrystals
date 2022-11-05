@@ -303,7 +303,7 @@ public class UtilityTesting
         
         foreach (var (p, p2) in u.Zip(uDecompressed))
         {
-            for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+            for (var i = 0; i < p.GetCoefficients().Count; i++)
             {
                 var isClose = TestHelpers.ElementsAreClose((short) p.GetCoefficient(i), (short) p2.GetCoefficient(i), du, 3329);
                 Assert.True(isClose);

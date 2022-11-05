@@ -22,10 +22,10 @@ public static class TestHelpers
 
     public static bool ComparePolynomials(Polynomial p1, Polynomial p2)
     {
-        if (p1.GetLengthOfPolynomial() != p2.GetLengthOfPolynomial())
+        if (p1.GetCoefficients().Count != p2.GetCoefficients().Count)
             return false;
 
-        for (var i = 0; i < p1.GetLengthOfPolynomial(); i++)
+        for (var i = 0; i < p1.GetCoefficients().Count; i++)
         {
             if (p1.GetCoefficient(i) != p2.GetCoefficient(i))
                 return false;

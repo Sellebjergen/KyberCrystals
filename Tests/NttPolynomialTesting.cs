@@ -35,11 +35,11 @@ public class NttPolynomialTesting
         var z = nttPolyConverter.InvNtt(x);
         var u = nttPolyConverter.FromMontgomery(z);
         
-        for (var i = 0; i < p.GetLengthOfPolynomial(); i++ )
+        for (var i = 0; i < p.GetCoefficients().Count; i++ )
         {
             Assert.True(u[i] == 2);
         }
-        for (var i = p.GetLengthOfPolynomial(); i < 256; i++) 
+        for (var i = p.GetCoefficients().Count; i < 256; i++) 
         {
             Assert.True(u[i] == 0);
         }

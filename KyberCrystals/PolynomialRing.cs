@@ -128,7 +128,7 @@ public class PolynomialRing
 
     public Polynomial Add(Polynomial p1, Polynomial p2)
     {
-        var maxDeg = Math.Max(p1.GetLengthOfPolynomial(), p2.GetLengthOfPolynomial());
+        var maxDeg = Math.Max(p1.GetCoefficients().Count, p2.GetCoefficients().Count);
         var p1Coef = p1.GetPaddedCoefficients(maxDeg);
         var p2Coef = p2.GetPaddedCoefficients(maxDeg);
 
@@ -145,14 +145,14 @@ public class PolynomialRing
     public Polynomial Mult(Polynomial p1, Polynomial p2)
     {
         var res = new List<BigInteger>();
-        for (var i = 0; i < Math.Pow(Math.Max(p1.GetLengthOfPolynomial(), p2.GetLengthOfPolynomial()), 2); i++)
+        for (var i = 0; i < Math.Pow(Math.Max(p1.GetCoefficients().Count, p2.GetCoefficients().Count), 2); i++)
         {
             res.Add(BigInteger.Zero);
         }
 
-        for (var i = 0; i < p1.GetLengthOfPolynomial(); i++)
+        for (var i = 0; i < p1.GetCoefficients().Count; i++)
         {
-            for (var j = 0; j < p2.GetLengthOfPolynomial(); j++)
+            for (var j = 0; j < p2.GetCoefficients().Count; j++)
             {
                 res[i + j] += p1.GetCoefficient(i) * p2.GetCoefficient(j);
             }
@@ -165,7 +165,7 @@ public class PolynomialRing
 
     public Polynomial Sub(Polynomial p1, Polynomial p2)
     {
-        var maxDeg = Math.Max(p1.GetLengthOfPolynomial(), p2.GetLengthOfPolynomial());
+        var maxDeg = Math.Max(p1.GetCoefficients().Count, p2.GetCoefficients().Count);
         var p1Coef = p1.GetPaddedCoefficients(maxDeg);
         var p2Coef = p2.GetPaddedCoefficients(maxDeg);
 

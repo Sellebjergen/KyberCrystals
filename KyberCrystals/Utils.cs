@@ -221,7 +221,7 @@ public static class Utils
     public static Polynomial Compress(Polynomial p, short d)
     {
         var coef = p.GetCoefficients();
-        for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+        for (var i = 0; i < p.GetCoefficients().Count; i++)
         {
             coef[i] = Compress((short) coef[i], d);
         }
@@ -248,7 +248,7 @@ public static class Utils
     public static Polynomial Decompress(Polynomial p, short d)
     {
         var coef = p.GetCoefficients();
-        for (var i = 0; i < p.GetLengthOfPolynomial(); i++)
+        for (var i = 0; i < p.GetCoefficients().Count; i++)
         {
             coef[i] = Decompress((short) coef[i], d);
         }
