@@ -25,7 +25,7 @@ public class UtilityTesting
     }
 
     [Fact]
-    public void sss() // TODO: better naming.
+    public void PRF_UsingRandomBytes_ReturnsCorrectLength()
     {
         var bytes = TestHelpers.GetRandomBytes(32);
         var b = TestHelpers.GetRandomByte();
@@ -74,7 +74,7 @@ public class UtilityTesting
     }
     
     [Fact]
-    public void Ss1() // TODO: better naming.
+    public void XOF_UsingRandomBytes_GivesCorrectLength()
     {
         var bytes = TestHelpers.GetRandomBytes(32);
         var b = TestHelpers.GetRandomByte();

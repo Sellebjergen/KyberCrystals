@@ -132,7 +132,6 @@ public class PolynomialRingTests
         var res = rq.Mult(p1, p2);
 
         Assert.True(res.GetDegree() < rq.N); 
-        // todo: should this be less than or equal? is x^17 in the ring x^17 + 1?
     }
     
     [Fact]
@@ -182,7 +181,7 @@ public class PolynomialRingTests
     {
         var p1 = new Polynomial(new List<BigInteger>{ -17, 0, 1 });
         var p2 = new Polynomial(new List<BigInteger>{ -3312, 0, 1 });
-        var rq = new PolynomialRing(3329, 256); // todo: var kyber params (maybe add to testhelper that I can this ring?
+        var rq = new PolynomialRing(3329, 256);
 
         var res = rq.Mult(p1, p2);
 
@@ -195,7 +194,7 @@ public class PolynomialRingTests
     {
         var p1 = new Polynomial(new List<BigInteger>{ 2298, 0, 3040, 0,568,0,1 });
         var p2 = new Polynomial(new List<BigInteger>{ -3281, 0, 1 });
-        var rq = new PolynomialRing(3329, 256); // todo: var kyber params (maybe add to testhelper that I can this ring?
+        var rq = new PolynomialRing(3329, 256);
 
         var res = rq.Mult(p1, p2);
 

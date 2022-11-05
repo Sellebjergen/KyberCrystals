@@ -18,7 +18,6 @@ public class KyberTests
         Assert.Equal(kEnc, kDec);
     }
 
-    // TODO: Correct all of these tests
     [Fact]
     public void CPAPKE_encrypt_decrypt_512()
     {

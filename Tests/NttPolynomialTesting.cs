@@ -60,7 +60,7 @@ public class NttPolynomialTesting
         var res3 = nttPolyConverter.FromMontgomery(res2);
         var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3)); // todo: this does not seem right???
         
-        var rq = new PolynomialRing(3329, 256); // todo kyber params.
+        var rq = new PolynomialRing(3329, 256);
         var expected = rq.Mult(p1, p2);
         
         Assert.True(TestHelpers.ComparePolynomials(expected, res4));
@@ -81,7 +81,7 @@ public class NttPolynomialTesting
         var res3 = nttPolyConverter.FromMontgomery(res2);
         var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3)); // todo: this does not seem right???
         
-        var rq = new PolynomialRing(3329, 256); // todo kyber params.
+        var rq = new PolynomialRing(3329, 256);
         var expected = rq.Mult(p1, p2);
         
         Assert.True(TestHelpers.ComparePolynomials(expected, res4));
@@ -102,7 +102,7 @@ public class NttPolynomialTesting
         var res3 = nttPolyConverter.FromMontgomery(res2);
         var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3)); // todo: this does not seem right???
         
-        var rq = new PolynomialRing(3329, 256); // todo kyber params.
+        var rq = new PolynomialRing(3329, 256);
         var expected = rq.Mult(p1, p2);
         
         Assert.True(TestHelpers.ComparePolynomials(expected, res4));

@@ -47,12 +47,6 @@ public class Polynomial
         return res;
     }
 
-    // todo: check use cases for this. Does it apply though it is not the degree?
-    public int GetLengthOfPolynomial()
-    {
-        return _coefficients.Count;
-    }
-
     public int GetDegree()
     {
         return _coefficients.Count - 1;
