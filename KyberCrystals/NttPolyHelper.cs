@@ -8,7 +8,8 @@ public class NttPolyHelper
 {
     private const short MontR2 = 1353;
 
-    public readonly List<BigInteger> NttZetas = new() // calc all of these dynamically.
+    public readonly List<BigInteger> NttZetas = new() 
+    // todo: calc all of these dynamically.
     { // Uses mont with R = 2^16 which have inverse 169 in mod 3329
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
