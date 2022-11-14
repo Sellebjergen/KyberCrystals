@@ -281,4 +281,14 @@ public static class Utils
 
         return res;
     }
+    
+    public static byte[] Get0Bytes(short amount)
+    {
+        var bytes = new byte[amount];
+        for (var i = 0; i < amount; i++)
+        {
+            bytes[i] = 0;
+        }
+        return bytes;
+    }
 }

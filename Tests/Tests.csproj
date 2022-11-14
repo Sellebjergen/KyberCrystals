@@ -25,4 +25,16 @@
       <ProjectReference Include="..\KyberCrystals\KyberCrystals.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="kats\PQCkemKAT_1632.rsp">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="kats\PQCkemKAT_2400.rsp">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+      <None Update="kats\PQCkemKAT_3168.rsp">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

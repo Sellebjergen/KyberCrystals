@@ -9,19 +9,29 @@ public class Kyber
     private readonly KyberParams _kyberParams;
     private readonly PolynomialRing _rq;
     private readonly NttPolyHelper _ntt;
+    private readonly IRng _rng;
 
     public Kyber(KyberParams p, PolynomialRing rq)
     {
         _kyberParams = p;
         _rq = rq;
         _ntt = new NttPolyHelper();
+        _rng = new StdRandom();
+    }
+    
+    public Kyber(KyberParams p, PolynomialRing rq, IRng rng)
+    {
+        _kyberParams = p;
+        _rq = rq;
+        _ntt = new NttPolyHelper();
+        _rng = rng;
     }
 
     public (CPAPKE_PublicKey, SecretKey) CCAKEM_keygen()
     {
         var (pk, skPrime) = CPAPKE_KeyGen();
-        var z = Utils.GetRandomBytes(32);
-    
+        var z = _rng.GetRandomBytes(32);
+        
         var sk = new SecretKey(
             skPrime, 
             pk, 
@@ -37,7 +47,7 @@ public class Kyber
         //     throw new ArgumentException(
         //         $"Pk should be of length {12 * _kyberParams.K * _kyberParams.N + 32 * 8} but was of length {pk.Length}");
 
-        var m = Utils.GetRandomBytes(32);
+        var m = _rng.GetRandomBytes(32);
         m = Utils.H(m);
 
         // todo: append concat bytes lists function.
@@ -100,7 +110,7 @@ public class Kyber
 
     public (CPAPKE_PublicKey, string) CPAPKE_KeyGen()
     {
-        var d = Utils.GetRandomBytes(32); // TODO: remember to uncomment this!
+        var d = _rng.GetRandomBytes(32);
         var (rho, sigma) = Utils.G(d);
         var n = 0;
 

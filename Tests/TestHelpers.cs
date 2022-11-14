@@ -79,4 +79,15 @@ public static class TestHelpers
         var exponent = q / Math.Pow(2, d + 1);
         return diff <= Convert.ToInt32(exponent);
     }
+    
+    public static byte[] GenerateEntropyInput()
+    {
+        var entropyInput = new byte[48];
+        for (var i = 0; i < entropyInput.Length; i++)
+        {
+            entropyInput[i] = Convert.ToByte(i);
+        }
+
+        return entropyInput;
+    }
 } 
