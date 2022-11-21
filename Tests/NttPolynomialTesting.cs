@@ -58,7 +58,7 @@ public class NttPolynomialTesting
         var res = nttPolyConverter.Multiplication(p1Ntt, p2Ntt);
         var res2 = nttPolyConverter.InvNtt(res.GetPaddedCoefficients(256));
         var res3 = nttPolyConverter.FromMontgomery(res2);
-        var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3)); // todo: this does not seem right???
+        var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3));
         
         var rq = new PolynomialRing(3329, 256);
         var expected = rq.Mult(p1, p2);
@@ -79,7 +79,7 @@ public class NttPolynomialTesting
         var res = nttPolyConverter.Multiplication(p1Ntt, p2Ntt);
         var res2 = nttPolyConverter.InvNtt(res.GetPaddedCoefficients(256));
         var res3 = nttPolyConverter.FromMontgomery(res2);
-        var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3)); // todo: this does not seem right???
+        var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3));
         
         var rq = new PolynomialRing(3329, 256);
         var expected = rq.Mult(p1, p2);
@@ -100,7 +100,7 @@ public class NttPolynomialTesting
         var res = nttPolyConverter.Multiplication(p1Ntt, p2Ntt);
         var res2 = nttPolyConverter.InvNtt(res.GetPaddedCoefficients(256));
         var res3 = nttPolyConverter.FromMontgomery(res2);
-        var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3)); // todo: this does not seem right???
+        var res4 = nttPolyConverter.ReduceCoefHacks(new Polynomial(res3));
         
         var rq = new PolynomialRing(3329, 256);
         var expected = rq.Mult(p1, p2);

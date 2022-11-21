@@ -4,8 +4,6 @@ using Xunit;
 
 namespace Tests;
 
-// TODO: Add some more theories, to test for more polynomials.
-
 public class PolynomiaTests
 {
     [Fact]
