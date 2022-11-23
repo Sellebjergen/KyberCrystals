@@ -27,7 +27,7 @@ public class Kyber
         _rng = rng;
     }
 
-    public (CPAPKE_PublicKey, SecretKey) CCAKEM_keygen()
+    public (CpapkePublicKey, SecretKey) CCAKEM_keygen()
     {
         var (pk, skPrime) = CPAPKE_KeyGen();
         var z = _rng.GetRandomBytes(32);
@@ -41,7 +41,7 @@ public class Kyber
         return (pk, sk);
     }
 
-    public (CPAPKE_Ciphertext, string) CCAKEM_encrypt(CPAPKE_PublicKey pk)
+    public (CPAPKE_Ciphertext, string) CCAKEM_encrypt(CpapkePublicKey pk)
     {
         // if (pk.Length != 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
         //     throw new ArgumentException(
@@ -108,7 +108,7 @@ public class Kyber
         return Utils.BytesToString(randomValue);
     }
 
-    public (CPAPKE_PublicKey, string) CPAPKE_KeyGen()
+    public (CpapkePublicKey, string) CPAPKE_KeyGen()
     {
         var d = _rng.GetRandomBytes(32);
         var (rho, sigma) = Utils.G(d);
@@ -146,13 +146,13 @@ public class Kyber
         for (var i = 0; i < s.Length; i++)
             s[i] = _rq.ReduceModuloQ(s[i]);
 
-        var pk = new CPAPKE_PublicKey(Utils.Encode(12, t), rho);
+        var pk = new CpapkePublicKey(Utils.Encode(12, t), rho);
         var sk = Utils.EncodePolynomialList(12, s);
 
         return (pk, sk);
     }
 
-    public CPAPKE_Ciphertext CPAPKE_encrypt(CPAPKE_PublicKey pk, byte[] m, byte[] coins)
+    public CPAPKE_Ciphertext CPAPKE_encrypt(CpapkePublicKey pk, byte[] m, byte[] coins)
     {
         // if (pk.Length < 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
         //     throw new ArgumentException("Expected longer public key value");

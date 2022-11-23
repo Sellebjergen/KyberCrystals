@@ -1,13 +1,11 @@
-using System.Collections;
-
 namespace KyberCrystals;
 
-public class CPAPKE_PublicKey
+public class CpapkePublicKey
 {
     public string[] Test;
     public byte[] Rho;
     
-    public CPAPKE_PublicKey(string[] test, byte[] rho)
+    public CpapkePublicKey(string[] test, byte[] rho)
     {
         Test = test;
         Rho = rho;
