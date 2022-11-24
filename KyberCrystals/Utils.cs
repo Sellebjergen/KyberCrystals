@@ -112,10 +112,7 @@ public static class Utils
         {
             var math = BigInteger.ModPow(i, n, q);
             if (math == 1)
-            {
                 return i;
-            }
-
             i += 1;
         }
     }
