@@ -2,8 +2,6 @@
 
 namespace KyberCrystals;
 
-// TODO: check the input fields in all functions. 
-
 public class Kyber
 {
     private readonly KyberParams _kyberParams;
@@ -61,7 +59,7 @@ public class Kyber
 
         var k = Utils.Kdf(kHc, 32);
 
-        return (c, k); // TODO: wouldn't it be better to just return the bytes right here?
+        return (c, k);
     }
 
     public byte[] CCAKEM_decrypt(CpapkeCiphertext c, SecretKey sk)
@@ -244,7 +242,6 @@ public class Kyber
         return Utils.Encode(1, Utils.Compress(m, 1));
     }
 
-    // todo: those could be private and use a strat pattern instead.
     public Polynomial[,] GenerateMatrix(byte[] rho, int k)
     {
         var a = new Polynomial[k, k];
@@ -263,7 +260,7 @@ public class Kyber
         return a;
     }
     
-    private Polynomial[] RetreiveSecretKey(string sk) // TODO: this could be refactored to be a secret key object?
+    private Polynomial[] RetreiveSecretKey(string sk)
     {
         var s = new Polynomial[_kyberParams.K];
         var subLength = sk.Length / _kyberParams.K;
