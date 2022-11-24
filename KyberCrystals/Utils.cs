@@ -210,7 +210,7 @@ public static class Utils
     
     public static BigInteger Compress(short x, short d)
     {
-        var compMod = Math.Pow(2, d) / 3329; // TODO: kyber params
+        var compMod = Math.Pow(2, d) / 3329; // kyber param modulus
         var res = Convert.ToInt16(compMod * x) % Math.Pow(2, d);
         return Convert.ToInt16(res);
     }
@@ -287,5 +287,13 @@ public static class Utils
             bytes[i] = 0;
         }
         return bytes;
+    }
+    
+    public static byte[] CombineArrays(byte[] arr1, byte[] arr2)
+    {
+        var res = new byte[arr1.Length + arr2.Length];
+        arr1.CopyTo(res, 0);
+        arr2.CopyTo(res, arr1.Length);
+        return res;
     }
 }

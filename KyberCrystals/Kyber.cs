@@ -41,7 +41,7 @@ public class Kyber
         return (pk, sk);
     }
 
-    public (CPAPKE_Ciphertext, string) CCAKEM_encrypt(CpapkePublicKey pk)
+    public (CpapkeCiphertext, byte[]) CCAKEM_encrypt(CpapkePublicKey pk)
     {
         // if (pk.Length != 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
         //     throw new ArgumentException(
@@ -50,26 +50,21 @@ public class Kyber
         var m = _rng.GetRandomBytes(32);
         m = Utils.H(m);
 
-        // todo: append concat bytes lists function.
         var hPk = Utils.H(Utils.GetBytes(pk.GetCombinedString()));
-        var mHpk = new byte[m.Length + hPk.Length];
-        m.CopyTo(mHpk, 0);
-        hPk.CopyTo(mHpk, m.Length);
+        var mHpk = Utils.CombineArrays(m, hPk);
 
         var (kPrime, r) = Utils.G(mHpk);
         var c = CPAPKE_encrypt(pk, m, r);
         var hC = Utils.H(Utils.GetBytes(c.GetBinaryString()));
 
-        var kHc = new byte[kPrime.Length + hC.Length];
-        kPrime.CopyTo(kHc, 0);
-        hC.CopyTo(kHc, kPrime.Length);
+        var kHc = Utils.CombineArrays(kPrime, hC);
 
         var k = Utils.Kdf(kHc, 32);
 
-        return (c, Utils.BytesToString(k)); // TODO: wouldn't it be better to just return the bytes right here?
+        return (c, k); // TODO: wouldn't it be better to just return the bytes right here?
     }
 
-    public string CCAKEM_decrypt(CPAPKE_Ciphertext c, SecretKey sk)
+    public byte[] CCAKEM_decrypt(CpapkeCiphertext c, SecretKey sk)
     {
         // if (sk.GetTotalLength() != 24 * _kyberParams.K * _kyberParams.N + 96 * 8)
         //     throw new ArgumentException(
@@ -96,16 +91,16 @@ public class Kyber
             hC.CopyTo(kHc, kPrime.Length);
         
             var k = Utils.Kdf(kHc, 32);
-            return Utils.BytesToString(k);
+            return k;
         }
 
         var tmp = Utils.H(Utils.GetBytes(c.GetBinaryString()));
         var buf = new byte[z.Length + tmp.Length];
         Array.Copy(z, buf, z.Length);
-        Array.Copy(tmp, 0, buf, z.Length, tmp.Length); // TODO: I really need a combine bytelists function
+        Array.Copy(tmp, 0, buf, z.Length, tmp.Length);
         
         var randomValue = Utils.Kdf(buf);
-        return Utils.BytesToString(randomValue);
+        return randomValue;
     }
 
     public (CpapkePublicKey, string) CPAPKE_KeyGen()
@@ -152,7 +147,7 @@ public class Kyber
         return (pk, sk);
     }
 
-    public CPAPKE_Ciphertext CPAPKE_encrypt(CpapkePublicKey pk, byte[] m, byte[] coins)
+    public CpapkeCiphertext CPAPKE_encrypt(CpapkePublicKey pk, byte[] m, byte[] coins)
     {
         // if (pk.Length < 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
         //     throw new ArgumentException("Expected longer public key value");
@@ -211,7 +206,7 @@ public class Kyber
         var tmpC2 = Utils.Compress(vPoly, (short)_kyberParams.Dv);
         var c2 = Utils.Encode(_kyberParams.Dv, tmpC2);
         
-        return new CPAPKE_Ciphertext(c1, c2);
+        return new CpapkeCiphertext(c1, c2);
     }
     
     private Polynomial ConvertMessageToPolynomial(byte[] m)
@@ -220,7 +215,7 @@ public class Kyber
         return _rq.ConstMult(binPoly, Convert.ToInt16(_kyberParams.Q / 2) + 1);
     }
 
-    public string CPAPKE_decrypt(string sk, CPAPKE_Ciphertext c)
+    public string CPAPKE_decrypt(string sk, CpapkeCiphertext c)
     {
         if (sk.Length != 12 * _kyberParams.K * _kyberParams.N)
             throw new ArgumentException(

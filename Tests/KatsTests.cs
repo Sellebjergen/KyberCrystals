@@ -28,11 +28,11 @@ public class KatsTests
 
             var (ct, ss) = kyber.CCAKEM_encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
-            Assert.Equal(katSs, GetHexFromBitString(ss));
+            Assert.Equal(katSs, Convert.ToHexString(ss));
 
             var ss2 = kyber.CCAKEM_decrypt(ct, sk);
-            Assert.Equal(GetHexFromBitString(ss2), katSs);
-            Assert.Equal(GetHexFromBitString(ss2), GetHexFromBitString(ss));
+            Assert.Equal(Convert.ToHexString(ss2), katSs);
+            Assert.Equal(ss2, ss);
         }
     }
     
@@ -59,11 +59,11 @@ public class KatsTests
 
             var (ct, ss) = kyber.CCAKEM_encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
-            Assert.Equal(katSs, GetHexFromBitString(ss));
+            Assert.Equal(katSs, Convert.ToHexString(ss));
 
             var ss2 = kyber.CCAKEM_decrypt(ct, sk);
-            Assert.Equal(GetHexFromBitString(ss2), katSs);
-            Assert.Equal(GetHexFromBitString(ss2), GetHexFromBitString(ss));
+            Assert.Equal(Convert.ToHexString(ss2), katSs);
+            Assert.Equal(Convert.ToHexString(ss2), Convert.ToHexString(ss));
         }
     }
     
@@ -90,11 +90,11 @@ public class KatsTests
 
             var (ct, ss) = kyber.CCAKEM_encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
-            Assert.Equal(katSs, GetHexFromBitString(ss));
+            Assert.Equal(katSs, Convert.ToHexString(ss));
 
             var ss2 = kyber.CCAKEM_decrypt(ct, sk);
-            Assert.Equal(GetHexFromBitString(ss2), katSs);
-            Assert.Equal(GetHexFromBitString(ss2), GetHexFromBitString(ss));
+            Assert.Equal(Convert.ToHexString(ss2), katSs);
+            Assert.Equal(Convert.ToHexString(ss2), Convert.ToHexString(ss));
         }
     }
     
