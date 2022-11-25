@@ -1,11 +1,11 @@
 namespace KyberCrystals;
 
-public class CpapkePublicKey
+public class PublicKey
 {
     public string[] Test;
     public byte[] Rho;
     
-    public CpapkePublicKey(string[] test, byte[] rho)
+    public PublicKey(string[] test, byte[] rho)
     {
         Test = test;
         Rho = rho;

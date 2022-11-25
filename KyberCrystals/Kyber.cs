@@ -25,7 +25,7 @@ public class Kyber
         _rng = rng;
     }
 
-    public (CpapkePublicKey, SecretKey) CCAKEM_keygen()
+    public (PublicKey, SecretKey) Keygen()
     {
         var (pk, skPrime) = CPAPKE_KeyGen();
         var z = _rng.GetRandomBytes(32);
@@ -39,12 +39,8 @@ public class Kyber
         return (pk, sk);
     }
 
-    public (CpapkeCiphertext, byte[]) CCAKEM_encrypt(CpapkePublicKey pk)
+    public (CipherText, byte[]) Encrypt(PublicKey pk)
     {
-        // if (pk.Length != 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
-        //     throw new ArgumentException(
-        //         $"Pk should be of length {12 * _kyberParams.K * _kyberParams.N + 32 * 8} but was of length {pk.Length}");
-
         var m = _rng.GetRandomBytes(32);
         m = Utils.H(m);
 
@@ -62,18 +58,8 @@ public class Kyber
         return (c, k);
     }
 
-    public byte[] CCAKEM_decrypt(CpapkeCiphertext c, SecretKey sk)
+    public byte[] Decrypt(CipherText c, SecretKey sk)
     {
-        // if (sk.GetTotalLength() != 24 * _kyberParams.K * _kyberParams.N + 96 * 8)
-        //     throw new ArgumentException(
-        //         $"The length of the secret key was expected to be {24 * _kyberParams.K * _kyberParams.N + 96 * 8} " +
-        //         $"but was found to be {sk.GetTotalLength()}");
-
-        // if (c.Length != _kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N)
-        //     throw new ArgumentException($"The length of the ciphertext is expected to be " +
-        //                                 $"{_kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N}" +
-        //                                 $"but was found to be {c.Length}");
-
         var (skPrime, pk, h, z) = sk.UnpackSecretKey();
 
         var mPrime = CPAPKE_decrypt(skPrime, c);
@@ -101,7 +87,7 @@ public class Kyber
         return randomValue;
     }
 
-    public (CpapkePublicKey, string) CPAPKE_KeyGen()
+    public (PublicKey, string) CPAPKE_KeyGen()
     {
         var d = _rng.GetRandomBytes(32);
         var (rho, sigma) = Utils.G(d);
@@ -139,16 +125,14 @@ public class Kyber
         for (var i = 0; i < s.Length; i++)
             s[i] = _rq.ReduceModuloQ(s[i]);
 
-        var pk = new CpapkePublicKey(Utils.Encode(12, t), rho);
+        var pk = new PublicKey(Utils.Encode(12, t), rho);
         var sk = Utils.EncodePolynomialList(12, s);
 
         return (pk, sk);
     }
 
-    public CpapkeCiphertext CPAPKE_encrypt(CpapkePublicKey pk, byte[] m, byte[] coins)
+    public CipherText CPAPKE_encrypt(PublicKey pk, byte[] m, byte[] coins)
     {
-        // if (pk.Length < 12 * _kyberParams.K * _kyberParams.N + 32 * 8)
-        //     throw new ArgumentException("Expected longer public key value");
         if (m.Length < 32)
             throw new ArgumentException($"Expected a message of length {32}, got one of length {m.Length}");
         if (coins.Length < 32)
@@ -204,7 +188,7 @@ public class Kyber
         var tmpC2 = Utils.Compress(vPoly, (short)_kyberParams.Dv);
         var c2 = Utils.Encode(_kyberParams.Dv, tmpC2);
         
-        return new CpapkeCiphertext(c1, c2);
+        return new CipherText(c1, c2);
     }
     
     private Polynomial ConvertMessageToPolynomial(byte[] m)
@@ -213,16 +197,8 @@ public class Kyber
         return _rq.ConstMult(binPoly, Convert.ToInt16(_kyberParams.Q / 2) + 1);
     }
 
-    public string CPAPKE_decrypt(string sk, CpapkeCiphertext c)
+    public string CPAPKE_decrypt(string sk, CipherText c)
     {
-        if (sk.Length != 12 * _kyberParams.K * _kyberParams.N)
-            throw new ArgumentException(
-                $"The secret key need to be of length {12 * _kyberParams.K * _kyberParams.N} but was of length {sk.Length}");
-        // if (c.Length != _kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N)
-        //     throw new ArgumentException(
-        //         $"The secret key need to be of length {_kyberParams.Du * _kyberParams.K * _kyberParams.N + _kyberParams.Dv * _kyberParams.N} but was of length {sk.Length}");
-        
-
         var uTmp = Utils.Decode(_kyberParams.Du, c.C1);
         var u = Utils.Decompress(uTmp, (short)_kyberParams.Du);
         var v = Utils.Decompress(Utils.Decode(_kyberParams.Dv, c.C2), (short)_kyberParams.Dv);

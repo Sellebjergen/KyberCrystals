@@ -22,15 +22,15 @@ public class KatsTests
                 new PolynomialRing(3329, 256), 
                 new AesCtrRng(Convert.FromHexString(seed)));
 
-            var (pk, sk) = kyber.CCAKEM_keygen();
+            var (pk, sk) = kyber.Keygen();
             Assert.Equal(katPk, GetHexFromBitString(pk.GetCombinedString()));
             Assert.Equal(katSk, GetHexFromBitString(sk.GetCombinedString()));
 
-            var (ct, ss) = kyber.CCAKEM_encrypt(pk);
+            var (ct, ss) = kyber.Encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
             Assert.Equal(katSs, Convert.ToHexString(ss));
 
-            var ss2 = kyber.CCAKEM_decrypt(ct, sk);
+            var ss2 = kyber.Decrypt(ct, sk);
             Assert.Equal(Convert.ToHexString(ss2), katSs);
             Assert.Equal(ss2, ss);
         }
@@ -53,15 +53,15 @@ public class KatsTests
                 new PolynomialRing(3329, 256), 
                 new AesCtrRng(Convert.FromHexString(seed)));
 
-            var (pk, sk) = kyber.CCAKEM_keygen();
+            var (pk, sk) = kyber.Keygen();
             Assert.Equal(katPk, GetHexFromBitString(pk.GetCombinedString()));
             Assert.Equal(katSk, GetHexFromBitString(sk.GetCombinedString()));
 
-            var (ct, ss) = kyber.CCAKEM_encrypt(pk);
+            var (ct, ss) = kyber.Encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
             Assert.Equal(katSs, Convert.ToHexString(ss));
 
-            var ss2 = kyber.CCAKEM_decrypt(ct, sk);
+            var ss2 = kyber.Decrypt(ct, sk);
             Assert.Equal(Convert.ToHexString(ss2), katSs);
             Assert.Equal(Convert.ToHexString(ss2), Convert.ToHexString(ss));
         }
@@ -84,15 +84,15 @@ public class KatsTests
                 new PolynomialRing(3329, 256), 
                 new AesCtrRng(Convert.FromHexString(seed)));
 
-            var (pk, sk) = kyber.CCAKEM_keygen();
+            var (pk, sk) = kyber.Keygen();
             Assert.Equal(katPk, GetHexFromBitString(pk.GetCombinedString()));
             Assert.Equal(katSk, GetHexFromBitString(sk.GetCombinedString()));
 
-            var (ct, ss) = kyber.CCAKEM_encrypt(pk);
+            var (ct, ss) = kyber.Encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
             Assert.Equal(katSs, Convert.ToHexString(ss));
 
-            var ss2 = kyber.CCAKEM_decrypt(ct, sk);
+            var ss2 = kyber.Decrypt(ct, sk);
             Assert.Equal(Convert.ToHexString(ss2), katSs);
             Assert.Equal(Convert.ToHexString(ss2), Convert.ToHexString(ss));
         }

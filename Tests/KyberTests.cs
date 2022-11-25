@@ -11,9 +11,9 @@ public class KyberTests
     {
         var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
-        var (pk, sk) = kyber.CCAKEM_keygen();
-        var (c, kEnc) = kyber.CCAKEM_encrypt(pk);
-        var kDec = kyber.CCAKEM_decrypt(c, sk);
+        var (pk, sk) = kyber.Keygen();
+        var (c, kEnc) = kyber.Encrypt(pk);
+        var kDec = kyber.Decrypt(c, sk);
         
         Assert.Equal(kEnc, kDec);
     }
@@ -163,9 +163,9 @@ public class KyberTests
     {
         var kyber = new Kyber(new ParameterGen().Kyber512(), new PolynomialRing(3329, 256));
     
-        var (pk, sk) = kyber.CCAKEM_keygen();
-        var (c, key) = kyber.CCAKEM_encrypt(pk);
-        var keyPrime = kyber.CCAKEM_decrypt(c, sk);
+        var (pk, sk) = kyber.Keygen();
+        var (c, key) = kyber.Encrypt(pk);
+        var keyPrime = kyber.Decrypt(c, sk);
     
         Assert.Equal(key, keyPrime);
     }
