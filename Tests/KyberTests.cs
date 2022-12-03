@@ -17,6 +17,30 @@ public class KyberTests
         
         Assert.Equal(kEnc, kDec);
     }
+    
+    [Fact]
+    public void CCAKEM_encrypt_decrypt_kyber768()
+    {
+        var param = new ParameterGen().Kyber768();
+        var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
+        var (pk, sk) = kyber.Keygen();
+        var (c, kEnc) = kyber.Encrypt(pk);
+        var kDec = kyber.Decrypt(c, sk);
+        
+        Assert.Equal(kEnc, kDec);
+    }
+    
+    [Fact]
+    public void CCAKEM_encrypt_decrypt_kyber1024()
+    {
+        var param = new ParameterGen().Kyber1024();
+        var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
+        var (pk, sk) = kyber.Keygen();
+        var (c, kEnc) = kyber.Encrypt(pk);
+        var kDec = kyber.Decrypt(c, sk);
+        
+        Assert.Equal(kEnc, kDec);
+    }
 
     [Fact]
     public void CPAPKE_encrypt_decrypt_512()
