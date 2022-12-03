@@ -52,7 +52,7 @@ public class KeyTests
         var (_, sk) = kyber.Keygen();
 
         var hex = GenerateHexFromBits(sk.GetCombinedString());
-        var skPrime = SecretKey.GenerateFromHex(hex, param.K);
+        var skPrime = SecretKey.CreateFromHex(hex, param.K);
 
         Assert.Equal(sk.GetCombinedString(), skPrime.GetCombinedString());
     }
@@ -65,7 +65,7 @@ public class KeyTests
         var (_, sk) = kyber.Keygen();
 
         var hex = GenerateHexFromBits(sk.GetCombinedString());
-        var skPrime = SecretKey.GenerateFromHex(hex, param.K);
+        var skPrime = SecretKey.CreateFromHex(hex, param.K);
 
         Assert.Equal(sk.GetCombinedString(), skPrime.GetCombinedString());
     }
@@ -78,9 +78,35 @@ public class KeyTests
         var (_, sk) = kyber.Keygen();
 
         var hex = GenerateHexFromBits(sk.GetCombinedString());
-        var skPrime = SecretKey.GenerateFromHex(hex, param.K);
+        var skPrime = SecretKey.CreateFromHex(hex, param.K);
 
         Assert.Equal(sk.GetCombinedString(), skPrime.GetCombinedString());
+    }
+    
+    [Fact]
+    public void ImportingAndExportingFromHexGivesSameSecretKey()
+    {
+        var param = new ParameterGen().Kyber1024();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (pk, _) = kyber.Keygen();
+
+        var hex = pk.GetAsHexString();
+        var pkPrime = PublicKey.CreateFromHex(hex, param.K);
+        
+        Assert.Equal(hex, pkPrime.GetAsHexString());
+    }
+    
+    [Fact]
+    public void ImportAndExportingFromHexGivesSamePublicKey()
+    {
+        var param = new ParameterGen().Kyber1024();
+        var kyber = new Kyber(param, new PolynomialRing(3329, 256));
+        var (_, sk) = kyber.Keygen();
+
+        var hex = sk.GetAsHexString();
+        var skPrime = SecretKey.CreateFromHex(hex, param.K);
+        
+        Assert.Equal(hex, skPrime.GetAsHexString());
     }
     
     private string GenerateHexFromBits(string bits)

@@ -16,6 +16,11 @@ public class PublicKey
         return string.Join("", Test) + Utils.BytesToString(Rho);
     }
     
+    public string GetAsHexString()
+    {
+        return Convert.ToHexString(Utils.GetBytes(GetCombinedString()));
+    }
+    
     public static PublicKey CreateFromHex(string hex, int k)
     {
         var bytesPrime = Convert.FromHexString(hex);

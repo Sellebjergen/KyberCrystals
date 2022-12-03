@@ -30,7 +30,7 @@ public class SecretKey
         return Convert.ToHexString(Utils.GetBytes(GetCombinedString()));
     }
 
-    public static SecretKey GenerateFromHex(string hex, int k)
+    public static SecretKey CreateFromHex(string hex, int k)
     {
         var bytes = Convert.FromHexString(hex);
         var offset = 0;
