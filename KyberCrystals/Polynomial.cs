@@ -39,10 +39,7 @@ public class Polynomial
         var res = new List<BigInteger>(_coefficients);
         var diff = totalLength - _coefficients.Count;
 
-        for (var i = 0; i < diff; i++)
-        {
-            res.Add(BigInteger.Zero);
-        }
+        for (var i = 0; i < diff; i++) res.Add(BigInteger.Zero);
 
         return res;
     }

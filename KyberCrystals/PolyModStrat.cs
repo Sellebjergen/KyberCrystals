@@ -3,11 +3,11 @@ using System.Numerics;
 namespace KyberCrystals;
 
 public interface IPolyModStrategy
-{ 
+{
     public Polynomial PolyMod(PolynomialRing rq, Polynomial p, Polynomial mod);
 }
 
-public class LongPolynomialDivision : IPolyModStrategy 
+public class LongPolynomialDivision : IPolyModStrategy
 {
     public Polynomial PolyMod(PolynomialRing rq, Polynomial p, Polynomial mod)
     {
@@ -15,7 +15,8 @@ public class LongPolynomialDivision : IPolyModStrategy
 
         while (!r.IsZeroPolynomial() && r.GetCoefficients().Count >= mod.GetCoefficients().Count)
         {
-            var t = r.GetCoefficient(r.GetCoefficients().Count - 1) / mod.GetCoefficient(mod.GetCoefficients().Count - 1);
+            var t = r.GetCoefficient(r.GetCoefficients().Count - 1) /
+                    mod.GetCoefficient(mod.GetCoefficients().Count - 1);
             var modMulT = rq.ConstMult(mod, t);
             var shift = ShiftPolynomial(modMulT, r.GetCoefficients().Count - mod.GetCoefficients().Count);
             r = rq.Sub(r, shift);

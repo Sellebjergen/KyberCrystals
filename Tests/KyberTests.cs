@@ -14,10 +14,10 @@ public class KyberTests
         var (pk, sk) = kyber.Keygen();
         var (c, kEnc) = kyber.Encrypt(pk);
         var kDec = kyber.Decrypt(c, sk);
-        
+
         Assert.Equal(kEnc, kDec);
     }
-    
+
     [Fact]
     public void CCAKEM_encrypt_decrypt_kyber768()
     {
@@ -26,10 +26,10 @@ public class KyberTests
         var (pk, sk) = kyber.Keygen();
         var (c, kEnc) = kyber.Encrypt(pk);
         var kDec = kyber.Decrypt(c, sk);
-        
+
         Assert.Equal(kEnc, kDec);
     }
-    
+
     [Fact]
     public void CCAKEM_encrypt_decrypt_kyber1024()
     {
@@ -38,7 +38,7 @@ public class KyberTests
         var (pk, sk) = kyber.Keygen();
         var (c, kEnc) = kyber.Encrypt(pk);
         var kDec = kyber.Decrypt(c, sk);
-        
+
         Assert.Equal(kEnc, kDec);
     }
 
@@ -48,45 +48,45 @@ public class KyberTests
         var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
-    
+
         var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
         var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    
+
         Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
-    
+
     [Fact]
     public void CPAPKE_encrypt_decrypt_512_2()
     {
         var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
-    
+
         var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('1', 256));
         var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    
+
         Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
-    
+
     [Fact]
     public void CPAPKE_encrypt_decrypt_768()
     {
         var param = new ParameterGen().Kyber768();
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, sk) = kyber.CPAPKE_KeyGen();
-    
+
         var m = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
         var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    
+
         Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
-    
+
     [Fact]
     public void CPAPKE_encrypt_decrypt_1024()
     {
@@ -98,7 +98,7 @@ public class KyberTests
         var coins = Utils.GetBytes(TestHelpers.GetRepeatedChar('0', 256));
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
-    
+
         Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
 
@@ -131,9 +131,9 @@ public class KyberTests
     [Fact]
     public void TheModPoly_CanBeWrittenAs_ProductOf2DegPolynomials()
     {
-        var rq = new PolynomialRing(3329, 256); 
+        var rq = new PolynomialRing(3329, 256);
 
-        var rootOfUnity = Utils.GetRootOfUnity(256, 3329); 
+        var rootOfUnity = Utils.GetRootOfUnity(256, 3329);
         var sum = new Polynomial(new List<BigInteger>
         {
             BigInteger.ModPow(-rootOfUnity, 2 * Utils.Br7(0) + 1, 3329),
@@ -155,7 +155,7 @@ public class KyberTests
     [Fact]
     public void EncodeAndDecodePolynomial_Gives_SamePolynomial()
     {
-        var p = new Polynomial(new List<BigInteger> { 1, 1, 1, });
+        var p = new Polynomial(new List<BigInteger> { 1, 1, 1 });
         var res = Utils.Decode(12, Utils.Encode(12, p));
         res.RemoveTrailingZeros();
 
@@ -165,7 +165,7 @@ public class KyberTests
     [Fact]
     public void EncodeAndDecodePolynomial_Gives_SamePolynomial2()
     {
-        var p = new Polynomial(new List<BigInteger> { 2, 2, 2, });
+        var p = new Polynomial(new List<BigInteger> { 2, 2, 2 });
         var res = Utils.Decode(12, Utils.Encode(12, p));
         res.RemoveTrailingZeros();
 
@@ -175,30 +175,30 @@ public class KyberTests
     [Fact]
     public void EncodeAndDecodePolynomial_Gives_SamePolynomial3()
     {
-        var p = new Polynomial(new List<BigInteger> { 3, 3, 3, });
+        var p = new Polynomial(new List<BigInteger> { 3, 3, 3 });
         var res = Utils.Decode(12, Utils.Encode(12, p));
         res.RemoveTrailingZeros();
 
         Assert.True(TestHelpers.ComparePolynomials(p, res));
     }
-    
+
     [Fact]
     public void Debugging()
     {
         var kyber = new Kyber(new ParameterGen().Kyber512(), new PolynomialRing(3329, 256));
-    
+
         var (pk, sk) = kyber.Keygen();
         var (c, key) = kyber.Encrypt(pk);
         var keyPrime = kyber.Decrypt(c, sk);
-    
+
         Assert.Equal(key, keyPrime);
     }
-    
+
     [Fact]
     public void CryptographicRandomlySecureRandomness()
     {
         var kyber = new Kyber(
-            new ParameterGen().Kyber512(), 
+            new ParameterGen().Kyber512(),
             new PolynomialRing(3329, 256),
             new CryptoRandom());
 

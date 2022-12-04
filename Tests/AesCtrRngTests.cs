@@ -13,10 +13,10 @@ public class AesCtrRngTests
 
         // First seed in PQCkemKAT_1632.rsp
         var seed = "061550234D158C5EC95595FE04EF7A25767F2E24CC2BC479D09D86DC9ABCFDE7056A8C266F9EF97ED08541DBD2E1FFA1";
-        
+
         Assert.Equal(Convert.FromHexString(seed), rng.GetRandomBytes(48));
     }
-    
+
     [Fact]
     public void CheckingTheEcbAesEncryptionWorks()
     {
@@ -26,7 +26,7 @@ public class AesCtrRngTests
 
         Assert.Equal(Convert.ToHexString(x), "530f8afbc74536b9a963b4f1c4cb738b".ToUpper());
     }
-    
+
     [Fact]
     public void CheckingThatAllSeedsCanBeMadeWithAesEcbMode_kyber512()
     {
@@ -43,7 +43,7 @@ public class AesCtrRngTests
 
         Assert.Equal(2, 2);
     }
-    
+
     [Fact]
     public void CheckingThatAllSeedsCanBeMadeWithAesEcbMode_kyber768()
     {
@@ -60,7 +60,7 @@ public class AesCtrRngTests
 
         Assert.Equal(2, 2);
     }
-    
+
     [Fact]
     public void CheckingThatAllSeedsCanBeMadeWithAesEcbMode_kyber1024()
     {

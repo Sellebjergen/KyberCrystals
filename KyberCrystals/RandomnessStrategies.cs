@@ -9,7 +9,6 @@ public interface IRng
     public byte[] GetRandomBytes(int amount);
 }
 
-
 public class StdRandom : IRng
 {
     public byte[] GetRandomBytes(int amount)
@@ -40,15 +39,15 @@ public class AesCtrRng : IRng
     {
         _key = Utils.Get0Bytes(32);
         _v = Utils.Get0Bytes(16);
-        
+
         CtrDrgbUpdate(seed);
     }
-    
+
     public byte[] GetRandomBytes(int amount)
     {
         var tmp = new byte[48];
         var counter = 0;
-        
+
         while (counter < amount)
         {
             IncrementCounter();
@@ -56,11 +55,11 @@ public class AesCtrRng : IRng
             Array.Copy(enc, 0, tmp, counter, enc.Length);
             counter += enc.Length;
         }
-        
+
         CtrDrgbUpdate(Utils.Get0Bytes(48));
         var res = new byte[amount];
         Array.Copy(tmp, res, amount);
-        
+
         return res;
     }
 
@@ -71,10 +70,10 @@ public class AesCtrRng : IRng
         var newLength = length + 1;
         var x = newLength.ToByteArray();
         Array.Reverse(x);
-        
-        if (x.Length == 17)             // removes the first 0 byte that has been introduced above.
-            x = x.Skip(1).ToArray(); 
-        
+
+        if (x.Length == 17) // removes the first 0 byte that has been introduced above.
+            x = x.Skip(1).ToArray();
+
         if (x.Length != 16)
         {
             var newX = new byte[16];
@@ -91,7 +90,7 @@ public class AesCtrRng : IRng
     {
         var tmp = new byte[48];
         var counter = 0;
-        
+
         while (counter < 48)
         {
             IncrementCounter();
@@ -101,10 +100,7 @@ public class AesCtrRng : IRng
         }
 
         var res = new byte[48];
-        for (var i = 0; i < tmp.Length; i++)
-        {
-            res[i] = (byte) (tmp[i] ^ data[i]);
-        }
+        for (var i = 0; i < tmp.Length; i++) res[i] = (byte)(tmp[i] ^ data[i]);
 
         var key = new byte[32];
         var v = new byte[16];
@@ -117,10 +113,10 @@ public class AesCtrRng : IRng
 
     public static byte[] EncryptAesEcb(byte[] plainText, byte[] key)
     {
-        using Aes aesAlg = Aes.Create();
+        using var aesAlg = Aes.Create();
         aesAlg.Key = key;
         aesAlg.IV = Utils.Get0Bytes(16);
-        
+
         return aesAlg.EncryptEcb(plainText, PaddingMode.None);
     }
 }

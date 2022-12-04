@@ -30,7 +30,7 @@ public class ParameterGen
             Dv = 4
         };
     }
-    
+
     public KyberParams Kyber1024()
     {
         return new KyberParams
@@ -44,7 +44,7 @@ public class ParameterGen
             Dv = 5
         };
     }
-    
+
     public DilithiumParams DilithiumWeak()
     {
         return new DilithiumParams
@@ -61,7 +61,7 @@ public class ParameterGen
             Omega = 64
         };
     }
-    
+
     public DilithiumParams DilithiumMedium()
     {
         return new DilithiumParams
@@ -78,7 +78,7 @@ public class ParameterGen
             Omega = 80
         };
     }
-    
+
     public DilithiumParams DilithiumRecommended()
     {
         return new DilithiumParams
@@ -95,7 +95,7 @@ public class ParameterGen
             Omega = 96
         };
     }
-    
+
     public DilithiumParams DilithiumHigh()
     {
         return new DilithiumParams

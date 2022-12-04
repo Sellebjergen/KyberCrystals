@@ -29,13 +29,14 @@ public class PolynomiaTests
         var rq = new PolynomialRing(p.Q, p.N);
         var res1 = rq.Decode(bytes, l);
         var res2 = rq.Decode(bytes, l);
-        
+
         Assert.True(TestHelpers.ComparePolynomials(res1, res2));
     }
 
     [Fact]
-    public void AskingFor_NotSetCoefficient_Returns0() {
-        var p = new Polynomial(new List<BigInteger> {1, 2, 3});
+    public void AskingFor_NotSetCoefficient_Returns0()
+    {
+        var p = new Polynomial(new List<BigInteger> { 1, 2, 3 });
         var notSetCoef = p.GetCoefficient(8);
 
         Assert.Equal(0, notSetCoef);
@@ -60,11 +61,11 @@ public class PolynomiaTests
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        
-        var poly1 = new Polynomial(new List<BigInteger> { 1, 1, 1});
+
+        var poly1 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
         var poly2 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
         var res = rq.Mult(poly1, poly2);
-        
+
         var expPoly = new Polynomial(new List<BigInteger> { 1, 2, 3, 2, 1 }); // found with google
         Assert.True(TestHelpers.ComparePolynomials(res, expPoly));
     }
@@ -80,15 +81,14 @@ public class PolynomiaTests
         var res = rq.Mult(poly1, poly2);
 
         Assert.True(res.GetCoefficients().TrueForAll(x => x < param.Q));
-
-}
+    }
 
     [Fact]
     public void RemoveTrailingZeros_ReducesTheDegree()
     {
-        var p = new Polynomial(new List<BigInteger> { 1, 0, 0, 0});
+        var p = new Polynomial(new List<BigInteger> { 1, 0, 0, 0 });
         p.RemoveTrailingZeros();
-        
+
         Assert.Equal(1, p.GetCoefficients().Count);
     }
 
@@ -104,7 +104,6 @@ public class PolynomiaTests
     {
         var p = new Polynomial(new List<BigInteger> { 1, 2, 3, 4 });
         Assert.False(p.IsZeroPolynomial());
-        
     }
 
     [Fact]
@@ -112,11 +111,11 @@ public class PolynomiaTests
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        var poly1 = new Polynomial(new List<BigInteger> {0, 0, 0 });
-        var poly2 = new Polynomial(new List<BigInteger> { 0, 0,0 });
+        var poly1 = new Polynomial(new List<BigInteger> { 0, 0, 0 });
+        var poly2 = new Polynomial(new List<BigInteger> { 0, 0, 0 });
 
         var res = rq.Sub(poly1, poly2);
-        
+
         Assert.True(res.IsZeroPolynomial());
     }
 
@@ -125,25 +124,25 @@ public class PolynomiaTests
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        var poly1 = new Polynomial(new List<BigInteger> {1,1,1,});
-        var poly2 = new Polynomial(new List<BigInteger> { 1,1,1 });
+        var poly1 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
+        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
 
         var res = rq.Sub(poly1, poly2);
-        
+
         Assert.True(res.IsZeroPolynomial());
     }
-    
+
     [Fact]
     public void Sub_0PolyWith1Poly_GivesParamQPoly()
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        var poly1 = new Polynomial(new List<BigInteger> {0,0,0,});
-        var poly2 = new Polynomial(new List<BigInteger> { 1,1,1 });
+        var poly1 = new Polynomial(new List<BigInteger> { 0, 0, 0 });
+        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
 
         var res = rq.Sub(poly1, poly2);
         var expectedPoly = new Polynomial(new List<BigInteger> { param.Q - 1, param.Q - 1, param.Q - 1 });
-        
+
         Assert.True(TestHelpers.ComparePolynomials(res, expectedPoly));
     }
 
@@ -152,37 +151,37 @@ public class PolynomiaTests
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        var poly1 = new Polynomial(new List<BigInteger> {0,0,0,});
+        var poly1 = new Polynomial(new List<BigInteger> { 0, 0, 0 });
 
         var res = rq.ConstMult(poly1, 0);
         var expectedPoly = new Polynomial(new List<BigInteger> { 0, 0, 0 });
-        
+
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }
-    
+
     [Fact]
     public void ConstMult_1PolyWithOtherPoly_GivesOtherPoly()
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        var poly1 = new Polynomial(new List<BigInteger> {1,1,1,});
+        var poly1 = new Polynomial(new List<BigInteger> { 1, 1, 1 });
 
         var res = rq.ConstMult(poly1, 5);
         var expectedPoly = new Polynomial(new List<BigInteger> { 5, 5, 5 });
-        
+
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }
-    
+
     [Fact]
     public void ConstMult_WhichOverflows_ReturnsCorrect()
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        var poly1 = new Polynomial(new List<BigInteger> {param.Q - 1, param.Q - 1, param.Q - 1});
+        var poly1 = new Polynomial(new List<BigInteger> { param.Q - 1, param.Q - 1, param.Q - 1 });
 
         var res = rq.ConstMult(poly1, 2);
         var expectedPoly = new Polynomial(new List<BigInteger> { param.Q - 2, param.Q - 2, param.Q - 2 });
-        
+
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }
 
@@ -191,13 +190,13 @@ public class PolynomiaTests
     {
         var param = new ParameterGen().Kyber512();
         var rq = new PolynomialRing(param.Q, param.N);
-        
-        var poly1 = new Polynomial(new List<BigInteger> {1, 2, param.Q - 1});
-        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, param.Q - 1});
+
+        var poly1 = new Polynomial(new List<BigInteger> { 1, 2, param.Q - 1 });
+        var poly2 = new Polynomial(new List<BigInteger> { 1, 1, param.Q - 1 });
 
         var res = rq.Sub(poly1, poly2);
-        var expectedPoly = new Polynomial(new List<BigInteger> { 0, 1});
-        
+        var expectedPoly = new Polynomial(new List<BigInteger> { 0, 1 });
+
         Assert.True(TestHelpers.ComparePolynomials(expectedPoly, res));
     }
 }

@@ -16,10 +16,10 @@ public class KatsTests
             var katSk = lines[5 + i * 7].Split(" = ")[1];
             var katCt = lines[6 + i * 7].Split(" = ")[1];
             var katSs = lines[7 + i * 7].Split(" = ")[1];
-            
+
             var kyber = new Kyber(
-                new ParameterGen().Kyber512(), 
-                new PolynomialRing(3329, 256), 
+                new ParameterGen().Kyber512(),
+                new PolynomialRing(3329, 256),
                 new AesCtrRng(Convert.FromHexString(seed)));
 
             var (pk, sk) = kyber.Keygen();
@@ -35,7 +35,7 @@ public class KatsTests
             Assert.Equal(ss2, ss);
         }
     }
-    
+
     [Fact]
     public void Kyber768()
     {
@@ -47,10 +47,10 @@ public class KatsTests
             var katSk = lines[5 + i * 7].Split(" = ")[1];
             var katCt = lines[6 + i * 7].Split(" = ")[1];
             var katSs = lines[7 + i * 7].Split(" = ")[1];
-            
+
             var kyber = new Kyber(
-                new ParameterGen().Kyber768(), 
-                new PolynomialRing(3329, 256), 
+                new ParameterGen().Kyber768(),
+                new PolynomialRing(3329, 256),
                 new AesCtrRng(Convert.FromHexString(seed)));
 
             var (pk, sk) = kyber.Keygen();
@@ -66,7 +66,7 @@ public class KatsTests
             Assert.Equal(Convert.ToHexString(ss2), Convert.ToHexString(ss));
         }
     }
-    
+
     [Fact]
     public void Kyber1024()
     {
@@ -78,10 +78,10 @@ public class KatsTests
             var katSk = lines[5 + i * 7].Split(" = ")[1];
             var katCt = lines[6 + i * 7].Split(" = ")[1];
             var katSs = lines[7 + i * 7].Split(" = ")[1];
-            
+
             var kyber = new Kyber(
-                new ParameterGen().Kyber1024(), 
-                new PolynomialRing(3329, 256), 
+                new ParameterGen().Kyber1024(),
+                new PolynomialRing(3329, 256),
                 new AesCtrRng(Convert.FromHexString(seed)));
 
             var (pk, sk) = kyber.Keygen();
@@ -97,12 +97,14 @@ public class KatsTests
             Assert.Equal(Convert.ToHexString(ss2), Convert.ToHexString(ss));
         }
     }
-    
+
     # region helpers
+
     private string GetHexFromBitString(string bits)
     {
         var bytes = Utils.GetBytes(bits);
         return Convert.ToHexString(bytes);
     }
+
     # endregion
 }

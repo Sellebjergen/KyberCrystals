@@ -56,14 +56,15 @@ public static class Utils
 
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b);
-        
+
         if (length == 0)
         {
             var result = new byte[hashAlgorithm.GetByteLength()];
             hashAlgorithm.DoFinal(result, 0);
             return result;
         }
-        else {
+        else
+        {
             var result = new byte[length];
             hashAlgorithm.DoFinal(result, 0, length);
             return result;
@@ -82,7 +83,7 @@ public static class Utils
 
         var result = new byte[length];
         hashAlgorithm.DoFinal(result, 0, length);
-        
+
         return result;
     }
 
@@ -106,7 +107,9 @@ public static class Utils
         return result;
     }
 
-    public static int GetRootOfUnity(int polynomialDegree, int ringModulus) // polynomialDegree is degree of mod poly and ringModulus is the modulus of the ring.
+    public static int
+        GetRootOfUnity(int polynomialDegree,
+            int ringModulus) // polynomialDegree is degree of mod poly and ringModulus is the modulus of the ring.
     {
         var i = 2;
         while (true)
@@ -134,32 +137,29 @@ public static class Utils
     {
         var coef = p.GetPaddedCoefficients(256).ToArray();
         var res = "";
-        
+
         for (var i = 0; i < coef.Length; i++)
         {
-            var bitLLength= Convert.ToString((short) coef[i], 2).PadLeft(l, '0').ToCharArray();
+            var bitLLength = Convert.ToString((short)coef[i], 2).PadLeft(l, '0').ToCharArray();
             Array.Reverse(bitLLength);
             res += new string(bitLLength);
         }
-        
+
         return res;
     }
-    
+
     public static string[] Encode(int l, Polynomial[] polys)
     {
         var res = new string[polys.Length];
-        for (var i = 0; i < polys.Length; i++)
-        {
-            res[i] = Encode(l, polys[i]);
-        }
-        
+        for (var i = 0; i < polys.Length; i++) res[i] = Encode(l, polys[i]);
+
         return res;
     }
 
     public static Polynomial Decode(int l, string bits)
     {
         var coef = new BigInteger[256];
-        
+
         for (var i = 0; i < bits.Length / l; i++)
         {
             var tmp = bits.Substring(i * l, l).ToCharArray();
@@ -170,30 +170,27 @@ public static class Utils
 
         return new Polynomial(new List<BigInteger>(coef));
     }
-    
+
     public static Polynomial[] Decode(int l, string[] bytesArr)
     {
         var res = new Polynomial[bytesArr.Length];
-        
+
         for (var i = 0; i < bytesArr.Length; i++)
         {
             var bytes = bytesArr[i];
             res[i] = Decode(l, bytes);
         }
-        
+
         return res;
     }
-    
+
     public static string EncodePolynomialList(int l, Polynomial[] polys)
     {
         var res = new string[polys.Length];
-        
-        for (var i = 0; i < polys.Length; i++)
-        {
-            res[i] = Encode(l, polys[i]);
-        }
 
-        return String.Join("", res);
+        for (var i = 0; i < polys.Length; i++) res[i] = Encode(l, polys[i]);
+
+        return string.Join("", res);
     }
 
     public static byte[] GetBytes(string bitString)
@@ -208,59 +205,47 @@ public static class Utils
 
         return bytes;
     }
-    
+
     public static BigInteger Compress(short x, short d)
     {
         var compMod = Math.Pow(2, d) / 3329; // kyber param modulus
         var res = Convert.ToInt16(compMod * x) % Math.Pow(2, d);
         return Convert.ToInt16(res);
     }
-    
+
     public static Polynomial Compress(Polynomial p, short d)
     {
         var coef = p.GetCoefficients();
-        for (var i = 0; i < p.GetCoefficients().Count; i++)
-        {
-            coef[i] = Compress((short) coef[i], d);
-        }
+        for (var i = 0; i < p.GetCoefficients().Count; i++) coef[i] = Compress((short)coef[i], d);
         return new Polynomial(coef);
     }
-    
+
     public static Polynomial[] Compress(Polynomial[] polys, short d)
     {
         var res = new Polynomial[polys.Length];
-        for (var i = 0; i < polys.Length; i++)
-        {
-            res[i] = Compress(polys[i], d);
-        }
+        for (var i = 0; i < polys.Length; i++) res[i] = Compress(polys[i], d);
 
         return res;
     }
-    
+
     public static BigInteger Decompress(short x, short d)
     {
         var decomConstant = 3329 / Math.Pow(2, d);
         return Convert.ToInt16(decomConstant * x);
     }
-    
+
     public static Polynomial Decompress(Polynomial p, short d)
     {
         var coef = p.GetCoefficients();
-        for (var i = 0; i < p.GetCoefficients().Count; i++)
-        {
-            coef[i] = Decompress((short) coef[i], d);
-        }
+        for (var i = 0; i < p.GetCoefficients().Count; i++) coef[i] = Decompress((short)coef[i], d);
 
         return new Polynomial(coef);
     }
-    
+
     public static Polynomial[] Decompress(Polynomial[] polys, short d)
     {
         var res = new Polynomial[polys.Length];
-        for (var i = 0; i < polys.Length; i++)
-        {
-            res[i] = Decompress(polys[i], d);
-        }
+        for (var i = 0; i < polys.Length; i++) res[i] = Decompress(polys[i], d);
 
         return res;
     }
@@ -270,26 +255,21 @@ public static class Utils
         var bits = new BitArray(bytes);
         var res = "";
         for (var i = 0; i < bits.Length; i++)
-        {
-            if (bits[i]) 
+            if (bits[i])
                 res += "1";
-            else 
+            else
                 res += "0";
-        }
 
         return res;
     }
-    
+
     public static byte[] Get0Bytes(short amount)
     {
         var bytes = new byte[amount];
-        for (var i = 0; i < amount; i++)
-        {
-            bytes[i] = 0;
-        }
+        for (var i = 0; i < amount; i++) bytes[i] = 0;
         return bytes;
     }
-    
+
     public static byte[] CombineArrays(byte[] arr1, byte[] arr2)
     {
         var res = new byte[arr1.Length + arr2.Length];

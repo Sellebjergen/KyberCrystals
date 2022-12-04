@@ -5,9 +5,9 @@ namespace KyberCrystals;
 public class Kyber
 {
     private readonly KyberParams _kyberParams;
-    private readonly PolynomialRing _rq;
     private readonly NttPolyHelper _ntt;
     private readonly IRng _rng;
+    private readonly PolynomialRing _rq;
 
     public Kyber(KyberParams p, PolynomialRing rq)
     {
@@ -16,7 +16,7 @@ public class Kyber
         _ntt = new NttPolyHelper();
         _rng = new StdRandom();
     }
-    
+
     public Kyber(KyberParams p, PolynomialRing rq, IRng rng)
     {
         _kyberParams = p;
@@ -29,13 +29,13 @@ public class Kyber
     {
         var (pk, skPrime) = CPAPKE_KeyGen();
         var z = _rng.GetRandomBytes(32);
-        
+
         var sk = new SecretKey(
-            skPrime, 
-            pk, 
-            Utils.H(Utils.GetBytes(pk.GetAsBinaryOutput())), 
+            skPrime,
+            pk,
+            Utils.H(Utils.GetBytes(pk.GetAsBinaryOutput())),
             z);
-   
+
         return (pk, sk);
     }
 
@@ -69,11 +69,11 @@ public class Kyber
         if (c.GetBinaryString() == cPrime.GetBinaryString())
         {
             var hC = Utils.H(Utils.GetBytes(c.GetBinaryString()));
-        
+
             var kHc = new byte[kPrime.Length + hC.Length];
             kPrime.CopyTo(kHc, 0);
             hC.CopyTo(kHc, kPrime.Length);
-        
+
             var k = Utils.Kdf(kHc, 32);
             return k;
         }
@@ -82,7 +82,7 @@ public class Kyber
         var buf = new byte[z.Length + tmp.Length];
         Array.Copy(z, buf, z.Length);
         Array.Copy(tmp, 0, buf, z.Length, tmp.Length);
-        
+
         var randomValue = Utils.Kdf(buf);
         return randomValue;
     }
@@ -115,18 +115,13 @@ public class Kyber
         }
 
         foreach (var p in s)
-        {
             // TODO: this could return an NttPolynomial to make it explicit that it is not an algebraic polynomial.
             _ntt.Ntt(p.GetPaddedCoefficients(256));
-        }
-        foreach (var p in e)
-        {
-            _ntt.Ntt(p.GetPaddedCoefficients(256));
-        }
+        foreach (var p in e) _ntt.Ntt(p.GetPaddedCoefficients(256));
 
         // Calculate value of t
         var t = CalcTMatrix(a, s, e);
-        
+
         for (var i = 0; i < s.Length; i++)
             s[i] = _rq.ReduceModuloQ(s[i]);
 
@@ -156,10 +151,7 @@ public class Kyber
         }
 
         var rNtt = new Polynomial[_kyberParams.K];
-        for (var i = 0; i < _kyberParams.K; i++)
-        {
-            rNtt[i] = new Polynomial(_ntt.Ntt(r[i].GetPaddedCoefficients(256)));
-        }
+        for (var i = 0; i < _kyberParams.K; i++) rNtt[i] = new Polynomial(_ntt.Ntt(r[i].GetPaddedCoefficients(256)));
 
         var e1 = new Polynomial[_kyberParams.K];
         for (var i = 0; i < _kyberParams.K; i++)
@@ -168,34 +160,35 @@ public class Kyber
             e1[i] = _rq.Cbd(tmpPrf, _kyberParams.Eta2);
             n += 1;
         }
-        
+
         var e2 = _rq.Cbd(Utils.Prf(coins, Convert.ToByte(n), _kyberParams.Eta2 * 64), _kyberParams.Eta2);
 
         // calculate value u
         var uNtt = CalcUMatrix(aInv, rNtt, e1);
-        
+
         // calculate the value of v.
         var sum = new Polynomial(new List<BigInteger> { 0 });
         for (var i = 0; i < _kyberParams.K; i++)
         {
             var tmp = _ntt.Multiplication(
-                tNtt[i].GetPaddedCoefficients(256), 
+                tNtt[i].GetPaddedCoefficients(256),
                 rNtt[i].GetPaddedCoefficients(256));
             sum = _rq.Add(sum, tmp);
         }
+
         var v = _ntt.InvNtt(sum.GetPaddedCoefficients(256));
-        
+
         var vPoly = new Polynomial(v);
         vPoly = _rq.Add(vPoly, e2);
         vPoly = _rq.Add(vPoly, ConvertMessageToPolynomial(m));
-        
+
         var c1 = Utils.Encode(_kyberParams.Du, Utils.Compress(uNtt, (short)_kyberParams.Du));
         var tmpC2 = Utils.Compress(vPoly, (short)_kyberParams.Dv);
         var c2 = Utils.Encode(_kyberParams.Dv, tmpC2);
-        
+
         return new CipherText(c1, c2);
     }
-    
+
     private Polynomial ConvertMessageToPolynomial(byte[] m)
     {
         var binPoly = Utils.Decode(1, Utils.BytesToBinaryString(m));
@@ -207,16 +200,17 @@ public class Kyber
         var uTmp = Utils.Decode(_kyberParams.Du, c.C1);
         var u = Utils.Decompress(uTmp, (short)_kyberParams.Du);
         var v = Utils.Decompress(Utils.Decode(_kyberParams.Dv, c.C2), (short)_kyberParams.Dv);
-        
+
         var s = RetrieveSecretKey(sk);
         var uNtt = u.Select(p => _ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
-        
+
         var sum = new Polynomial(new List<BigInteger> { 0 });
         for (var i = 0; i < _kyberParams.K; i++)
         {
             var tmp = _ntt.Multiplication(s[i].GetPaddedCoefficients(256), uNtt[i]);
             sum = _rq.Add(sum, tmp);
         }
+
         var vPoly = new Polynomial(_ntt.InvNtt(sum.GetPaddedCoefficients(256)));
         var m = _rq.Sub(v, vPoly);
 
@@ -228,28 +222,23 @@ public class Kyber
         var a = new Polynomial[k, k];
 
         for (var i = 0; i < k; i++)
+        for (var j = 0; j < k; j++)
         {
-            for (var j = 0; j < k; j++)
-            {
-                var jByte = BitConverter.GetBytes(j).First();
-                var iByte = BitConverter.GetBytes(i).First();
+            var jByte = BitConverter.GetBytes(j).First();
+            var iByte = BitConverter.GetBytes(i).First();
 
-                a[i, j] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq.N)));
-            }
+            a[i, j] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq.N)));
         }
 
         return a;
     }
-    
+
     private Polynomial[] RetrieveSecretKey(string sk)
     {
         var s = new Polynomial[_kyberParams.K];
         var subLength = sk.Length / _kyberParams.K;
-        for (var i = 0; i < _kyberParams.K; i++)
-        {
-            s[i] = Utils.Decode(12, sk.Substring(i * subLength, subLength));
-        }
-        
+        for (var i = 0; i < _kyberParams.K; i++) s[i] = Utils.Decode(12, sk.Substring(i * subLength, subLength));
+
         return s;
     }
 
@@ -258,40 +247,38 @@ public class Kyber
         var a = new Polynomial[k, k];
 
         for (var i = 0; i < k; i++)
+        for (var j = 0; j < k; j++)
         {
-            for (var j = 0; j < k; j++)
-            {
-                var jByte = BitConverter.GetBytes(j).First();
-                var iByte = BitConverter.GetBytes(i).First();
+            var jByte = BitConverter.GetBytes(j).First();
+            var iByte = BitConverter.GetBytes(i).First();
 
-                a[j, i] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq.N)));
-            }
+            a[j, i] = _rq.Parse(Utils.Xof(rho, jByte, iByte, (int)(3 * _rq.N)));
         }
 
         return a;
     }
-    
+
     private Polynomial[] CalcUMatrix(Polynomial[,] aInv, Polynomial[] rNtt, Polynomial[] e1)
     {
         var uNtt = new Polynomial[_kyberParams.K];
-        
+
         for (var i = 0; i < _kyberParams.K; i++)
         {
             var sum = new Polynomial(new List<BigInteger> { 0 });
             for (var j = 0; j < _kyberParams.K; j++)
             {
                 var x = _ntt.Multiplication(
-                    aInv[i, j].GetPaddedCoefficients(256), 
+                    aInv[i, j].GetPaddedCoefficients(256),
                     rNtt[j].GetPaddedCoefficients(256));
                 sum = _rq.Add(sum, x);
             }
 
             uNtt[i] = _rq.Add(new Polynomial(_ntt.InvNtt(sum.GetPaddedCoefficients(256))), e1[i]);
         }
-        
+
         return uNtt;
     }
-    
+
     private Polynomial[] CalcTMatrix(Polynomial[,] a, Polynomial[] s, Polynomial[] e)
     {
         var t = new Polynomial[_kyberParams.K];
@@ -302,14 +289,14 @@ public class Kyber
             for (var j = 0; j < _kyberParams.K; j++)
             {
                 var x = _ntt.Multiplication(
-                    a[i, j].GetPaddedCoefficients(256), 
+                    a[i, j].GetPaddedCoefficients(256),
                     s[j].GetPaddedCoefficients(256));
                 sum = _rq.Add(sum, x);
             }
 
             t[i] = _rq.Add(new Polynomial(_ntt.to_montgomery(sum)), e[i]);
         }
-        
+
         return t;
     }
 }

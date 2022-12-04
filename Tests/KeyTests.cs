@@ -17,7 +17,7 @@ public class KeyTests
 
         Assert.Equal(pk.GetAsBinaryOutput(), pkPrime.GetAsBinaryOutput());
     }
-    
+
     [Fact]
     public void PublicKey_Generation_GivesTheSameAsFromHex_Kyber768()
     {
@@ -30,7 +30,7 @@ public class KeyTests
 
         Assert.Equal(pk.GetAsBinaryOutput(), pkPrime.GetAsBinaryOutput());
     }
-    
+
     [Fact]
     public void PublicKey_Generation_GivesTheSameAsFromHex_Kyber1024()
     {
@@ -43,7 +43,7 @@ public class KeyTests
 
         Assert.Equal(pk.GetAsBinaryOutput(), pkPrime.GetAsBinaryOutput());
     }
-    
+
     [Fact]
     public void SecretKey_Generation_GivesTheSameAsFromHex_Kyber512()
     {
@@ -56,7 +56,7 @@ public class KeyTests
 
         Assert.Equal(sk.GetAsBinaryOutput(), skPrime.GetAsBinaryOutput());
     }
-    
+
     [Fact]
     public void SecretKey_Generation_GivesTheSameAsFromHex_Kyber768()
     {
@@ -69,7 +69,7 @@ public class KeyTests
 
         Assert.Equal(sk.GetAsBinaryOutput(), skPrime.GetAsBinaryOutput());
     }
-    
+
     [Fact]
     public void SecretKey_Generation_GivesTheSameAsFromHex_Kyber1024()
     {
@@ -82,7 +82,7 @@ public class KeyTests
 
         Assert.Equal(sk.GetAsBinaryOutput(), skPrime.GetAsBinaryOutput());
     }
-    
+
     [Fact]
     public void ImportingAndExportingFromHexGivesSameSecretKey()
     {
@@ -92,10 +92,10 @@ public class KeyTests
 
         var hex = pk.GetAsHexString();
         var pkPrime = PublicKey.CreateFromHex(hex, param.K);
-        
+
         Assert.Equal(hex, pkPrime.GetAsHexString());
     }
-    
+
     [Fact]
     public void ImportAndExportingFromHexGivesSamePublicKey()
     {
@@ -105,10 +105,10 @@ public class KeyTests
 
         var hex = sk.GetAsHexString();
         var skPrime = SecretKey.CreateFromHex(hex, param.K);
-        
+
         Assert.Equal(hex, skPrime.GetAsHexString());
     }
-    
+
     private string GenerateHexFromBits(string bits)
     {
         var bytes = Utils.GetBytes(bits);
