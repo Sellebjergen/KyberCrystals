@@ -145,7 +145,7 @@ public class UtilityTesting
         var a = "00000001";
         var b = Utils.GetBytes(a);
         
-        Assert.Equal(a, Utils.BytesToString(b));
+        Assert.Equal(a, Utils.BytesToBinaryString(b));
     }
     
     [Fact]
@@ -154,7 +154,7 @@ public class UtilityTesting
         var a = "10000000";
         var b = Utils.GetBytes(a);
         
-        Assert.Equal(a, Utils.BytesToString(b));
+        Assert.Equal(a, Utils.BytesToBinaryString(b));
     }
     
     [Fact]

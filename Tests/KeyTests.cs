@@ -12,10 +12,10 @@ public class KeyTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, _) = kyber.Keygen();
 
-        var hex = GenerateHexFromBits(pk.GetCombinedString());
+        var hex = GenerateHexFromBits(pk.GetAsBinaryOutput());
         var pkPrime = PublicKey.CreateFromHex(hex, param.K);
 
-        Assert.Equal(pk.GetCombinedString(), pkPrime.GetCombinedString());
+        Assert.Equal(pk.GetAsBinaryOutput(), pkPrime.GetAsBinaryOutput());
     }
     
     [Fact]
@@ -25,10 +25,10 @@ public class KeyTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, _) = kyber.Keygen();
 
-        var hex = GenerateHexFromBits(pk.GetCombinedString());
+        var hex = GenerateHexFromBits(pk.GetAsBinaryOutput());
         var pkPrime = PublicKey.CreateFromHex(hex, param.K);
 
-        Assert.Equal(pk.GetCombinedString(), pkPrime.GetCombinedString());
+        Assert.Equal(pk.GetAsBinaryOutput(), pkPrime.GetAsBinaryOutput());
     }
     
     [Fact]
@@ -38,10 +38,10 @@ public class KeyTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (pk, _) = kyber.Keygen();
 
-        var hex = GenerateHexFromBits(pk.GetCombinedString());
+        var hex = GenerateHexFromBits(pk.GetAsBinaryOutput());
         var pkPrime = PublicKey.CreateFromHex(hex, param.K);
 
-        Assert.Equal(pk.GetCombinedString(), pkPrime.GetCombinedString());
+        Assert.Equal(pk.GetAsBinaryOutput(), pkPrime.GetAsBinaryOutput());
     }
     
     [Fact]
@@ -51,10 +51,10 @@ public class KeyTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (_, sk) = kyber.Keygen();
 
-        var hex = GenerateHexFromBits(sk.GetCombinedString());
+        var hex = GenerateHexFromBits(sk.GetAsBinaryOutput());
         var skPrime = SecretKey.CreateFromHex(hex, param.K);
 
-        Assert.Equal(sk.GetCombinedString(), skPrime.GetCombinedString());
+        Assert.Equal(sk.GetAsBinaryOutput(), skPrime.GetAsBinaryOutput());
     }
     
     [Fact]
@@ -64,10 +64,10 @@ public class KeyTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (_, sk) = kyber.Keygen();
 
-        var hex = GenerateHexFromBits(sk.GetCombinedString());
+        var hex = GenerateHexFromBits(sk.GetAsBinaryOutput());
         var skPrime = SecretKey.CreateFromHex(hex, param.K);
 
-        Assert.Equal(sk.GetCombinedString(), skPrime.GetCombinedString());
+        Assert.Equal(sk.GetAsBinaryOutput(), skPrime.GetAsBinaryOutput());
     }
     
     [Fact]
@@ -77,10 +77,10 @@ public class KeyTests
         var kyber = new Kyber(param, new PolynomialRing(3329, 256));
         var (_, sk) = kyber.Keygen();
 
-        var hex = GenerateHexFromBits(sk.GetCombinedString());
+        var hex = GenerateHexFromBits(sk.GetAsBinaryOutput());
         var skPrime = SecretKey.CreateFromHex(hex, param.K);
 
-        Assert.Equal(sk.GetCombinedString(), skPrime.GetCombinedString());
+        Assert.Equal(sk.GetAsBinaryOutput(), skPrime.GetAsBinaryOutput());
     }
     
     [Fact]

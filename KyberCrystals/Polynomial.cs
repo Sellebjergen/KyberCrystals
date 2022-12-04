@@ -34,7 +34,7 @@ public class Polynomial
         if (totalLength == _coefficients.Count)
             return _coefficients;
         if (totalLength < _coefficients.Count)
-            throw new ArgumentException($"Can't return coefficients shorter than the polynomial.");
+            throw new ArgumentException("Can't return coefficients shorter than the polynomial.");
 
         var res = new List<BigInteger>(_coefficients);
         var diff = totalLength - _coefficients.Count;

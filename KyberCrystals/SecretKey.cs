@@ -15,19 +15,19 @@ public class SecretKey
         _z = z;
     }
     
-    public (string, PublicKey , byte[], byte[]) UnpackSecretKey()
+    public (string skPrime, PublicKey pk, byte[] h, byte[] z) UnpackSecretKey()
     {
         return (_skPrime, _pk, _h, _z);
     }
     
-    public string GetCombinedString()
+    public string GetAsBinaryOutput()
     {
-        return _skPrime + _pk.GetCombinedString() + Utils.BytesToString(_h) + Utils.BytesToString(_z);
+        return _skPrime + _pk.GetAsBinaryOutput() + Utils.BytesToBinaryString(_h) + Utils.BytesToBinaryString(_z);
     }
-    
+
     public string GetAsHexString()
     {
-        return Convert.ToHexString(Utils.GetBytes(GetCombinedString()));
+        return Convert.ToHexString(Utils.GetBytes(GetAsBinaryOutput()));
     }
 
     public static SecretKey CreateFromHex(string hex, int k)
@@ -50,7 +50,7 @@ public class SecretKey
         Array.Copy(bytes, bytes.Length - 32, z, 0, 32);
 
         return new SecretKey(
-            Utils.BytesToString(skPrime), 
+            Utils.BytesToBinaryString(skPrime), 
             PublicKey.CreateFromHex(Convert.ToHexString(pk), k), 
             hpk, 
             z);

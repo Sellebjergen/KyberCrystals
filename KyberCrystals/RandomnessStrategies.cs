@@ -18,6 +18,18 @@ public class StdRandom : IRng
     }
 }
 
+public class CryptoRandom : IRng
+{
+    public byte[] GetRandomBytes(int amount)
+    {
+        var res = new byte[amount];
+
+        var crypRng = RandomNumberGenerator.Create();
+        crypRng.GetBytes(res);
+
+        return res;
+    }
+}
 
 public class AesCtrRng : IRng
 {

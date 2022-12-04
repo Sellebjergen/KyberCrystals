@@ -131,13 +131,13 @@ public class PolynomialRing
         var p1Coef = p1.GetPaddedCoefficients(maxDeg);
         var p2Coef = p2.GetPaddedCoefficients(maxDeg);
 
-        var result = new List<BigInteger> { };
+        var tmp = new List<BigInteger>();
         foreach (var (x, y) in p1Coef.Zip(p2Coef))
         {
-            result.Add(x + y);
+            tmp.Add(x + y);
         }
 
-        var res = ReduceModuloQ(new Polynomial(result));
+        var res = ReduceModuloQ(new Polynomial(tmp));
         return res;
     }
 
@@ -168,7 +168,7 @@ public class PolynomialRing
         var p1Coef = p1.GetPaddedCoefficients(maxDeg);
         var p2Coef = p2.GetPaddedCoefficients(maxDeg);
 
-        var result = new List<BigInteger> { };
+        var result = new List<BigInteger>();
         foreach (var (x, y) in p1Coef.Zip(p2Coef))
         {
             result.Add(x - y);

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Numerics;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace KyberCrystals;
 
@@ -17,7 +18,7 @@ public static class Utils
 
     public static (byte[], byte[]) G(byte[] input)
     {
-        var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.Sha3Digest(512);
+        var hashAlgorithm = new Sha3Digest(512);
 
         hashAlgorithm.BlockUpdate(input, 0, input.Length);
 
@@ -34,7 +35,7 @@ public static class Utils
 
     public static byte[] H(byte[] input)
     {
-        var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.Sha3Digest(256);
+        var hashAlgorithm = new Sha3Digest(256);
 
         hashAlgorithm.BlockUpdate(input, 0, input.Length);
 
@@ -51,7 +52,7 @@ public static class Utils
         if (length < 0)
             throw new ArgumentException("The length must be a positive number!"); // use -1 for when no number is set
 
-        var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
+        var hashAlgorithm = new ShakeDigest(256);
 
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b);
@@ -74,7 +75,7 @@ public static class Utils
         if (bytes.Length != 32)
             throw new ArgumentException("The byte array need to be of length 32");
 
-        var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(128);
+        var hashAlgorithm = new ShakeDigest(128);
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
         hashAlgorithm.Update(b1);
         hashAlgorithm.Update(b2);
@@ -87,7 +88,7 @@ public static class Utils
 
     public static byte[] Kdf(byte[] bytes, int length = 0)
     {
-        var hashAlgorithm = new Org.BouncyCastle.Crypto.Digests.ShakeDigest(256);
+        var hashAlgorithm = new ShakeDigest(256);
         hashAlgorithm.BlockUpdate(bytes, 0, bytes.Length);
 
         byte[] result;
@@ -105,12 +106,12 @@ public static class Utils
         return result;
     }
 
-    public static int GetRootOfUnity(int n, int q) // n is degree of mod poly and q is the modulus of the ring.
+    public static int GetRootOfUnity(int polynomialDegree, int ringModulus) // polynomialDegree is degree of mod poly and ringModulus is the modulus of the ring.
     {
         var i = 2;
         while (true)
         {
-            var math = BigInteger.ModPow(i, n, q);
+            var math = BigInteger.ModPow(i, polynomialDegree, ringModulus);
             if (math == 1)
                 return i;
             i += 1;
@@ -264,9 +265,9 @@ public static class Utils
         return res;
     }
 
-    public static string BytesToString(byte[] p0)
+    public static string BytesToBinaryString(byte[] bytes)
     {
-        var bits = new BitArray(p0);
+        var bits = new BitArray(bytes);
         var res = "";
         for (var i = 0; i < bits.Length; i++)
         {

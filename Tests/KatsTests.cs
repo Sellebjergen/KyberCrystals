@@ -23,8 +23,8 @@ public class KatsTests
                 new AesCtrRng(Convert.FromHexString(seed)));
 
             var (pk, sk) = kyber.Keygen();
-            Assert.Equal(katPk, GetHexFromBitString(pk.GetCombinedString()));
-            Assert.Equal(katSk, GetHexFromBitString(sk.GetCombinedString()));
+            Assert.Equal(katPk, GetHexFromBitString(pk.GetAsBinaryOutput()));
+            Assert.Equal(katSk, GetHexFromBitString(sk.GetAsBinaryOutput()));
 
             var (ct, ss) = kyber.Encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
@@ -54,8 +54,8 @@ public class KatsTests
                 new AesCtrRng(Convert.FromHexString(seed)));
 
             var (pk, sk) = kyber.Keygen();
-            Assert.Equal(katPk, GetHexFromBitString(pk.GetCombinedString()));
-            Assert.Equal(katSk, GetHexFromBitString(sk.GetCombinedString()));
+            Assert.Equal(katPk, GetHexFromBitString(pk.GetAsBinaryOutput()));
+            Assert.Equal(katSk, GetHexFromBitString(sk.GetAsBinaryOutput()));
 
             var (ct, ss) = kyber.Encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));
@@ -85,8 +85,8 @@ public class KatsTests
                 new AesCtrRng(Convert.FromHexString(seed)));
 
             var (pk, sk) = kyber.Keygen();
-            Assert.Equal(katPk, GetHexFromBitString(pk.GetCombinedString()));
-            Assert.Equal(katSk, GetHexFromBitString(sk.GetCombinedString()));
+            Assert.Equal(katPk, GetHexFromBitString(pk.GetAsBinaryOutput()));
+            Assert.Equal(katSk, GetHexFromBitString(sk.GetAsBinaryOutput()));
 
             var (ct, ss) = kyber.Encrypt(pk);
             Assert.Equal(katCt, GetHexFromBitString(ct.GetBinaryString()));

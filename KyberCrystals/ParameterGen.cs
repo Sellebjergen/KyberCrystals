@@ -47,7 +47,7 @@ public class ParameterGen
     
     public DilithiumParams DilithiumWeak()
     {
-        return new DilithiumParams()
+        return new DilithiumParams
         {
             Q = 8380417,
             D = 14,
@@ -64,7 +64,7 @@ public class ParameterGen
     
     public DilithiumParams DilithiumMedium()
     {
-        return new DilithiumParams()
+        return new DilithiumParams
         {
             Q = 8380417,
             D = 14,
@@ -81,7 +81,7 @@ public class ParameterGen
     
     public DilithiumParams DilithiumRecommended()
     {
-        return new DilithiumParams()
+        return new DilithiumParams
         {
             Q = 8380417,
             D = 14,
@@ -98,7 +98,7 @@ public class ParameterGen
     
     public DilithiumParams DilithiumHigh()
     {
-        return new DilithiumParams()
+        return new DilithiumParams
         {
             Q = 8380417,
             D = 14,

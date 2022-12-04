@@ -54,7 +54,7 @@ public class KyberTests
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
     
-        Assert.Equal(Utils.BytesToString(m), mPrime);
+        Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
     
     [Fact]
@@ -69,7 +69,7 @@ public class KyberTests
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
     
-        Assert.Equal(Utils.BytesToString(m), mPrime);
+        Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
     
     [Fact]
@@ -84,7 +84,7 @@ public class KyberTests
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
     
-        Assert.Equal(Utils.BytesToString(m), mPrime);
+        Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
     
     [Fact]
@@ -99,7 +99,7 @@ public class KyberTests
         var c = kyber.CPAPKE_encrypt(pk, m, coins);
         var mPrime = kyber.CPAPKE_decrypt(sk, c);
     
-        Assert.Equal(Utils.BytesToString(m), mPrime);
+        Assert.Equal(Utils.BytesToBinaryString(m), mPrime);
     }
 
     [Fact]
@@ -191,6 +191,21 @@ public class KyberTests
         var (c, key) = kyber.Encrypt(pk);
         var keyPrime = kyber.Decrypt(c, sk);
     
+        Assert.Equal(key, keyPrime);
+    }
+    
+    [Fact]
+    public void CryptographicRandomlySecureRandomness()
+    {
+        var kyber = new Kyber(
+            new ParameterGen().Kyber512(), 
+            new PolynomialRing(3329, 256),
+            new CryptoRandom());
+
+        var (pk, sk) = kyber.Keygen();
+        var (c, key) = kyber.Encrypt(pk);
+        var keyPrime = kyber.Decrypt(c, sk);
+
         Assert.Equal(key, keyPrime);
     }
 }

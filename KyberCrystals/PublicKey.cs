@@ -11,20 +11,20 @@ public class PublicKey
         Rho = rho;
     }
     
-    public string GetCombinedString()
+    public string GetAsBinaryOutput()
     {
-        return string.Join("", Test) + Utils.BytesToString(Rho);
+        return string.Join("", Test) + Utils.BytesToBinaryString(Rho);
     }
     
     public string GetAsHexString()
     {
-        return Convert.ToHexString(Utils.GetBytes(GetCombinedString()));
+        return Convert.ToHexString(Utils.GetBytes(GetAsBinaryOutput()));
     }
     
     public static PublicKey CreateFromHex(string hex, int k)
     {
         var bytesPrime = Convert.FromHexString(hex);
-        var bitsPrime = Utils.BytesToString(bytesPrime);
+        var bitsPrime = Utils.BytesToBinaryString(bytesPrime);
         var testBits = bitsPrime.Substring(0, bitsPrime.Length - 32 * 8);
 
         if (testBits.Length != k * 12 * 256) 

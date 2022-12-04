@@ -33,7 +33,7 @@ public class Kyber
         var sk = new SecretKey(
             skPrime, 
             pk, 
-            Utils.H(Utils.GetBytes(pk.GetCombinedString())), 
+            Utils.H(Utils.GetBytes(pk.GetAsBinaryOutput())), 
             z);
    
         return (pk, sk);
@@ -44,7 +44,7 @@ public class Kyber
         var m = _rng.GetRandomBytes(32);
         m = Utils.H(m);
 
-        var hPk = Utils.H(Utils.GetBytes(pk.GetCombinedString()));
+        var hPk = Utils.H(Utils.GetBytes(pk.GetAsBinaryOutput()));
         var mHpk = Utils.CombineArrays(m, hPk);
 
         var (kPrime, r) = Utils.G(mHpk);
@@ -63,7 +63,7 @@ public class Kyber
         var (skPrime, pk, h, z) = sk.UnpackSecretKey();
 
         var mPrime = CPAPKE_decrypt(skPrime, c);
-        var (kPrime, rPrime) = Utils.G(Utils.GetBytes(mPrime + Utils.BytesToString(h)));
+        var (kPrime, rPrime) = Utils.G(Utils.GetBytes(mPrime + Utils.BytesToBinaryString(h)));
 
         var cPrime = CPAPKE_encrypt(pk, Utils.GetBytes(mPrime), rPrime);
         if (c.GetBinaryString() == cPrime.GetBinaryString())
@@ -114,10 +114,15 @@ public class Kyber
             n += 1;
         }
 
-        foreach (var p in s) // TODO: this could return an NttPolynomial to make it explicit that it is not an algebraic polynomial.
+        foreach (var p in s)
+        {
+            // TODO: this could return an NttPolynomial to make it explicit that it is not an algebraic polynomial.
             _ntt.Ntt(p.GetPaddedCoefficients(256));
+        }
         foreach (var p in e)
+        {
             _ntt.Ntt(p.GetPaddedCoefficients(256));
+        }
 
         // Calculate value of t
         var t = CalcTMatrix(a, s, e);
@@ -193,7 +198,7 @@ public class Kyber
     
     private Polynomial ConvertMessageToPolynomial(byte[] m)
     {
-        var binPoly = Utils.Decode(1, Utils.BytesToString(m));
+        var binPoly = Utils.Decode(1, Utils.BytesToBinaryString(m));
         return _rq.ConstMult(binPoly, Convert.ToInt16(_kyberParams.Q / 2) + 1);
     }
 
@@ -203,7 +208,7 @@ public class Kyber
         var u = Utils.Decompress(uTmp, (short)_kyberParams.Du);
         var v = Utils.Decompress(Utils.Decode(_kyberParams.Dv, c.C2), (short)_kyberParams.Dv);
         
-        var s = RetreiveSecretKey(sk);
+        var s = RetrieveSecretKey(sk);
         var uNtt = u.Select(p => _ntt.Ntt(p.GetPaddedCoefficients(256))).ToList();
         
         var sum = new Polynomial(new List<BigInteger> { 0 });
@@ -236,7 +241,7 @@ public class Kyber
         return a;
     }
     
-    private Polynomial[] RetreiveSecretKey(string sk)
+    private Polynomial[] RetrieveSecretKey(string sk)
     {
         var s = new Polynomial[_kyberParams.K];
         var subLength = sk.Length / _kyberParams.K;
@@ -248,7 +253,7 @@ public class Kyber
         return s;
     }
 
-    public Polynomial[,] GenerateTransposedMatrix(byte[] rho, int k)
+    private Polynomial[,] GenerateTransposedMatrix(byte[] rho, int k)
     {
         var a = new Polynomial[k, k];
 
