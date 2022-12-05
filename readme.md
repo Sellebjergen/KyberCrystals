@@ -94,4 +94,5 @@ For my project it has no implications, but this is something that one should not
 []  Use shorts instead of bigintegers\
 []  Make use of csharp spans\
 []  Use a better function for concatenating bytes\
-[]  Consider how all coefficients can be calculated and then moved into a list instead of moving them one by one.
+[]  Consider how all coefficients can be calculated and then moved into a list instead of moving them one by one.\
+[]  Return NTT polynomial and make NTTPolyHelper only work on this polynomial, to make it eksplicit it is not an algebraic polynomial.\
