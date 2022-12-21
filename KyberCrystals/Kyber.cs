@@ -39,7 +39,7 @@ public class Kyber
         return (pk, sk);
     }
 
-    public (CipherText, byte[]) Encrypt(PublicKey pk)
+    public (CipherText, byte[]) Encapsulate(PublicKey pk)
     {
         var m = _rng.GetRandomBytes(32);
         m = Utils.H(m);
@@ -52,13 +52,12 @@ public class Kyber
         var hC = Utils.H(Utils.GetBytes(c.GetBinaryString()));
 
         var kHc = Utils.CombineArrays(kPrime, hC);
-
         var k = Utils.Kdf(kHc, 32);
 
         return (c, k);
     }
 
-    public byte[] Decrypt(CipherText c, SecretKey sk)
+    public byte[] Decapsulate(CipherText c, SecretKey sk)
     {
         var (skPrime, pk, h, z) = sk.UnpackSecretKey();
 

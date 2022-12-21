@@ -9,9 +9,9 @@ public class NttPolyHelper
     private const short MontR2 = 1353;
 
     public readonly List<BigInteger> NttZetas = new()
-    // todo: calc all of these dynamically.
     {
         // Uses mont with R = 2^16 which have inverse 169 in mod 3329
+        // TODO: these could be dynamically calculated instead.
         2285, 2571, 2970, 1812, 1493, 1422, 287, 202, 3158, 622, 1577, 182, 962,
         2127, 1855, 1468, 573, 2004, 264, 383, 2500, 1458, 1727, 3199, 2648, 1017,
         732, 608, 1787, 411, 3124, 1758, 1223, 652, 2777, 1015, 2036, 1491, 3047,
@@ -101,7 +101,7 @@ public class NttPolyHelper
         var u = a * 62209; // todo 62209 -> param.qInv
         var t = u * 3329; // todo 3329 -> param.q
         t = a - t;
-        t >>= 16; // TODO: is this due to montgomery factor of 2^mont
+        t >>= 16; // TODO: is this due to montgomery factor of 2^16
         t %= 3329; // TODO: kyber param
 
         if (t < 0)
@@ -113,7 +113,7 @@ public class NttPolyHelper
     private BigInteger BarrettReduce(BigInteger a)
     {
         BigInteger t;
-        const long shift = (long) 1 << 26;
+        const long shift = (long)1 << 26;
         var v = (BigInteger)((shift + 3329 / 2) / 3329); // todo 3329 -> param.q
         t = (v * a) >> 26;
         t *= 3329; // todo 3329 -> param.q

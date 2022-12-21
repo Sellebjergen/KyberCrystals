@@ -62,7 +62,7 @@ public class NttPolynomialTesting
     {
         var nttPolyConverter = new NttPolyHelper();
         var p1 = new Polynomial(new List<BigInteger> { 2 });
-        var p2 = new Polynomial(new List<BigInteger> { 2 });
+        var p2 = new Polynomial(new List<BigInteger> { 2, 3 });
 
         var p1Ntt = nttPolyConverter.Ntt(p1.GetPaddedCoefficients(256));
         var p2Ntt = nttPolyConverter.Ntt(p2.GetPaddedCoefficients(256));

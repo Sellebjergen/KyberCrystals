@@ -12,8 +12,8 @@ public class KyberTests
         var param = new ParameterGen().Kyber512();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
         var (pk, sk) = kyber.Keygen();
-        var (c, kEnc) = kyber.Encrypt(pk);
-        var kDec = kyber.Decrypt(c, sk);
+        var (c, kEnc) = kyber.Encapsulate(pk);
+        var kDec = kyber.Decapsulate(c, sk);
 
         Assert.Equal(kEnc, kDec);
     }
@@ -24,8 +24,8 @@ public class KyberTests
         var param = new ParameterGen().Kyber768();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
         var (pk, sk) = kyber.Keygen();
-        var (c, kEnc) = kyber.Encrypt(pk);
-        var kDec = kyber.Decrypt(c, sk);
+        var (c, kEnc) = kyber.Encapsulate(pk);
+        var kDec = kyber.Decapsulate(c, sk);
 
         Assert.Equal(kEnc, kDec);
     }
@@ -36,8 +36,8 @@ public class KyberTests
         var param = new ParameterGen().Kyber1024();
         var kyber = new Kyber(param, new PolynomialRing(param.Q, param.N));
         var (pk, sk) = kyber.Keygen();
-        var (c, kEnc) = kyber.Encrypt(pk);
-        var kDec = kyber.Decrypt(c, sk);
+        var (c, kEnc) = kyber.Encapsulate(pk);
+        var kDec = kyber.Decapsulate(c, sk);
 
         Assert.Equal(kEnc, kDec);
     }
@@ -188,8 +188,8 @@ public class KyberTests
         var kyber = new Kyber(new ParameterGen().Kyber512(), new PolynomialRing(3329, 256));
 
         var (pk, sk) = kyber.Keygen();
-        var (c, key) = kyber.Encrypt(pk);
-        var keyPrime = kyber.Decrypt(c, sk);
+        var (c, key) = kyber.Encapsulate(pk);
+        var keyPrime = kyber.Decapsulate(c, sk);
 
         Assert.Equal(key, keyPrime);
     }
@@ -203,8 +203,8 @@ public class KyberTests
             new CryptoRandom());
 
         var (pk, sk) = kyber.Keygen();
-        var (c, key) = kyber.Encrypt(pk);
-        var keyPrime = kyber.Decrypt(c, sk);
+        var (c, key) = kyber.Encapsulate(pk);
+        var keyPrime = kyber.Decapsulate(c, sk);
 
         Assert.Equal(key, keyPrime);
     }
