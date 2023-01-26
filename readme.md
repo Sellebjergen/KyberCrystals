@@ -1,3 +1,6 @@
+:warning: Please do not use this for any real cryptographic use! It has been developeda as part of a project
+I made during my masters in Computer science! :warning:
+
 # Crystals-kyber implementation
 
 This is an implementation of the CRYSTALS-Kyber scheme based on version 3.02 of the 
