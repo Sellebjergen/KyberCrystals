@@ -1,5 +1,4 @@
-:warning: Please do not use this for any real cryptographic use! It has been developeda as part of a project
-I made during my masters in Computer science! :warning:
+:warning: Please do not use this for any real cryptographic use! :warning:
 
 # Crystals-kyber implementation
 
