@@ -230,7 +230,7 @@ public static class Utils
 
     public static BigInteger Decompress(short x, short d)
     {
-        var decomConstant = 3329 / Math.Pow(2, d);
+        var decomConstant = 3329 / Math.Pow(2, d); // kyber constant
         return Convert.ToInt16(decomConstant * x);
     }
 
